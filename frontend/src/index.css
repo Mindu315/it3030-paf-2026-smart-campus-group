@@ -1,3 +1,25 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+	:root {
+		color: #0f172a;
+		background-color: #f8fafc;
+	}
+
+	* {
+		@apply border-slate-200;
+	}
+
+	body {
+		@apply min-h-screen bg-slate-50 text-slate-900 antialiased;
+		font-family: 'Outfit', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+	}
+
+	#root {
+		@apply min-h-screen;
+	}
+}
