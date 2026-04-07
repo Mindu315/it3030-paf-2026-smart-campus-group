@@ -1,0 +1,84 @@
+import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom'
+import Admin from './components/Admin'
+import Home from './components/Home'
+import Login from './components/Login'
+import Register from './components/Register'
+import { getLandingRoute, hasRole, isAuthenticated } from './utils/auth'
+
+function RootRedirect() {
+  if (!isAuthenticated()) {
+    return <Navigate to="/login" replace />
+  }
+
+  return <Navigate to={getLandingRoute()} replace />
+}
+
+function PublicRoute({ children }) {
+  if (isAuthenticated()) {
+    return <Navigate to={getLandingRoute()} replace />
+  }
+
+  return children
+}
+
+function ProtectedRoute({ allowedRoles }) {
+  if (!isAuthenticated()) {
+    return <Navigate to="/login" replace />
+  }
+
+  const isAllowed = allowedRoles.some((role) => hasRole(role))
+
+  if (!isAllowed) {
+    return <Navigate to={getLandingRoute()} replace />
+  }
+
+  return <Outlet />
+}
+
+function App() {
+  return (
+    <div className="min-h-screen bg-slate-50">
+      <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_15%_10%,rgba(125,211,252,0.25),transparent_40%),radial-gradient(circle_at_85%_15%,rgba(110,231,183,0.18),transparent_42%)]" aria-hidden="true"></div>
+
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<RootRedirect />} />
+
+          <Route
+            path="/login"
+            element={(
+              <section className="mx-auto flex min-h-screen max-w-6xl items-center justify-center px-4 py-8 sm:px-6 lg:px-8">
+                <PublicRoute>
+                  <Login />
+                </PublicRoute>
+              </section>
+            )}
+          />
+
+          <Route
+            path="/register"
+            element={(
+              <section className="mx-auto flex min-h-screen max-w-6xl items-center justify-center px-4 py-8 sm:px-6 lg:px-8">
+                <PublicRoute>
+                  <Register />
+                </PublicRoute>
+              </section>
+            )}
+          />
+
+          <Route element={<ProtectedRoute allowedRoles={['USER', 'ADMIN']} />}>
+            <Route path="/home" element={<Home />} />
+          </Route>
+
+          <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
+            <Route path="/admin" element={<Admin />} />
+          </Route>
+
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </div>
+  )
+}
+
+export default App
