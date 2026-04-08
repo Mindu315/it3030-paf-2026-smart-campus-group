@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
+import { GoogleLogin } from "@react-oauth/google"
 import api from "../api/axiosConfig"
 import { getLandingRoute, saveUser } from "../utils/auth"
 import { Eye, EyeOff, Mail, Lock } from "lucide-react"
@@ -145,6 +146,37 @@ function Login() {
           >
             {isSubmitting ? "Signing in..." : "Login"}
           </button>
+
+          {/* Separator */}
+          <div className="relative flex items-center justify-center py-2">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-slate-200"></div>
+            </div>
+            <div className="relative bg-white px-2 text-sm text-slate-500">Or</div>
+          </div>
+
+          {/* Google Login */}
+          <div className="flex w-full justify-center">
+            <GoogleLogin
+              theme="outline"
+              size="large"
+              width="100%"
+              onSuccess={async (credentialResponse) => {
+                try {
+                  const response = await api.post('/users/google-login', { token: credentialResponse.credential })
+                  const user = response.data
+                  saveUser(user)
+                  navigate(getLandingRoute(user), { replace: true })
+                } catch (requestError) {
+                  const message = requestError.response?.data || "Google Login failed."
+                  setError(message)
+                }
+              }}
+              onError={() => {
+                setError("Google Login failed.")
+              }}
+            />
+          </div>
         </form>
 
         {/* Footer */}

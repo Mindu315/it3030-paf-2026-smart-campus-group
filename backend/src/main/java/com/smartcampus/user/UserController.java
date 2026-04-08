@@ -35,6 +35,16 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
     }
+
+    @PostMapping("/google-login")
+    public ResponseEntity<?> googleLogin(@RequestBody TokenRequest tokenRequest) {
+        try {
+            User authenticatedUser = userService.authenticateGoogleUser(tokenRequest.token());
+            return ResponseEntity.ok(authenticatedUser);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        }
+    }
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}/roles")
     public ResponseEntity<?> updateUserRoles(@PathVariable String id, @RequestBody List<String> roles) {
@@ -48,4 +58,5 @@ public class UserController {
     
     // Simple record for the login payload
     public record LoginRequest(String email, String password) {}
+    public record TokenRequest(String token) {}
 }
