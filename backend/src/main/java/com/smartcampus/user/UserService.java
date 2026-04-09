@@ -35,6 +35,12 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    //new
+    
+    public List<User> getAllUsers() {
+        return userRepository.findAll(); // This grabs every user document from MongoDB!
+    }
+
     public User authenticateUser(String email, String password) {
         Optional<User> userOptional = userRepository.findByEmail(email);
 

@@ -27,7 +27,12 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers("/api/users/register", "/api/users/login", "/api/users/google-login").permitAll()
+                // 👇 JUST ADDED "/api/users" RIGHT HERE! 👇
+                .requestMatchers("/api/users", "/api/users/register", "/api/users/login", "/api/users/google-login").permitAll()
+                
+                // (Optional: If your friends need their routes open to code without tokens right now, add this line)
+                // .requestMatchers("/api/bookings/**", "/api/tickets/**", "/api/resources/**").permitAll()
+                
                 .anyRequest().authenticated()
             );
         return http.build();
