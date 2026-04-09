@@ -5,7 +5,6 @@ import com.smartcampus.resource.dto.ResourceResponseDto;
 import com.smartcampus.resource.service.ResourceService;
 import jakarta.validation.Valid;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -21,11 +20,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/resources")
-@RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 public class ResourceController {
 
     private final ResourceService resourceService;
+    
+    public ResourceController(ResourceService resourceService) {
+        this.resourceService = resourceService;
+    }
 
     @PostMapping
     public ResponseEntity<ResourceResponseDto> createResource(@Valid @RequestBody ResourceRequestDto requestDto) {

@@ -8,14 +8,16 @@ import com.smartcampus.resource.repository.ResourceRepository;
 import com.smartcampus.resource.service.ResourceService;
 import java.util.List;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class ResourceServiceImpl implements ResourceService {
 
     private final ResourceRepository resourceRepository;
+    
+    public ResourceServiceImpl(ResourceRepository resourceRepository) {
+        this.resourceRepository = resourceRepository;
+    }
 
     @Override
     public ResourceResponseDto createResource(ResourceRequestDto requestDto) {
@@ -81,29 +83,29 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     private Resource mapToEntity(ResourceRequestDto dto) {
-        return Resource.builder()
-                .name(dto.getName())
-                .type(dto.getType())
-                .capacity(dto.getCapacity())
-                .location(dto.getLocation())
-                .availabilityStart(dto.getAvailabilityStart())
-                .availabilityEnd(dto.getAvailabilityEnd())
-                .status(dto.getStatus())
-                .description(dto.getDescription())
-                .build();
+        Resource resource = new Resource();
+        resource.setName(dto.getName());
+        resource.setType(dto.getType());
+        resource.setCapacity(dto.getCapacity());
+        resource.setLocation(dto.getLocation());
+        resource.setAvailabilityStart(dto.getAvailabilityStart());
+        resource.setAvailabilityEnd(dto.getAvailabilityEnd());
+        resource.setStatus(dto.getStatus());
+        resource.setDescription(dto.getDescription());
+        return resource;
     }
 
     private ResourceResponseDto mapToResponseDto(Resource resource) {
-        return ResourceResponseDto.builder()
-                .id(resource.getId())
-                .name(resource.getName())
-                .type(resource.getType())
-                .capacity(resource.getCapacity())
-                .location(resource.getLocation())
-                .availabilityStart(resource.getAvailabilityStart())
-                .availabilityEnd(resource.getAvailabilityEnd())
-                .status(resource.getStatus())
-                .description(resource.getDescription())
-                .build();
+        ResourceResponseDto responseDto = new ResourceResponseDto();
+        responseDto.setId(resource.getId());
+        responseDto.setName(resource.getName());
+        responseDto.setType(resource.getType());
+        responseDto.setCapacity(resource.getCapacity());
+        responseDto.setLocation(resource.getLocation());
+        responseDto.setAvailabilityStart(resource.getAvailabilityStart());
+        responseDto.setAvailabilityEnd(resource.getAvailabilityEnd());
+        responseDto.setStatus(resource.getStatus());
+        responseDto.setDescription(resource.getDescription());
+        return responseDto;
     }
 }
