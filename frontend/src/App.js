@@ -3,6 +3,8 @@ import Admin from './components/Admin'
 import Home from './components/Home'
 import Login from './components/Login'
 import Register from './components/Register'
+import ResourceCatalog from './components/ResourceCatalog'
+import ResourceManagement from './components/ResourceManagement'
 import { getLandingRoute, hasRole, isAuthenticated } from './utils/auth'
 
 function RootRedirect() {
@@ -72,6 +74,14 @@ function App() {
 
           <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
             <Route path="/admin" element={<Admin />} />
+          </Route>
+
+          <Route element={<ProtectedRoute allowedRoles={['USER']} />}>
+            <Route path="/resources" element={<ResourceCatalog />} />
+          </Route>
+
+          <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
+            <Route path="/admin/resources" element={<ResourceManagement />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />
