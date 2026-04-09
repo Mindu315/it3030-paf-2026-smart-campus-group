@@ -28,10 +28,15 @@ public class BookingController {
         return bookingService.getPendingBookings();
     }
 
-    @PutMapping("/{id}/status")
-    public Booking updateStatus(@PathVariable @NonNull String id, @RequestParam String status) {
-        return bookingService.updateStatus(id, status);
-    }
+   @PutMapping("/{id}/status")
+public ResponseEntity<Booking> updateStatus(
+    @PathVariable @NonNull String id, 
+    @RequestBody java.util.Map<String, String> payload // Change this line
+) {
+    String status = payload.get("status"); // Extract the status from the JSON body
+    Booking updatedBooking = bookingService.updateStatus(id, status);
+    return ResponseEntity.ok(updatedBooking);
+}
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> cancelBooking(@PathVariable @NonNull String id) {
@@ -42,4 +47,10 @@ public class BookingController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @GetMapping("/all")
+    public List<Booking> getAllBookings() {
+    // This returns EVERY booking in the DB (Pending, Approved, Rejected)
+    return bookingService.findAllBookings(); 
+}
 }

@@ -240,13 +240,13 @@ function DashboardHome() {
               </p>
 
               <div className="mt-6 space-y-3">
-                <Link
-                  to="/bookings/create"
-                  className="flex items-center justify-between rounded-2xl border border-slate-200 bg-sky-50 px-4 py-3 text-sm font-semibold text-sky-700 hover:bg-sky-100"
+                <button 
+                    onClick={() => navigate('/booking-history')} // Navigate to the new page
+                    className="flex items-center justify-between w-full p-4 rounded-2xl bg-white border border-slate-100 hover:bg-slate-50 transition-all"
                 >
-                  Create Booking
-                  <ArrowUpRight size={16} />
-                </Link>
+                    <span className="font-semibold text-blue-600">Booking History</span>
+                    <ArrowUpRight className="text-blue-600" size={18} />
+                </button>
 
                 <Link
                   to="/tickets/create"

@@ -11,6 +11,10 @@ public class BookingService {
     @Autowired
     private BookingRepository bookingRepository;
 
+    public List<Booking> findAllBookings() {
+    return bookingRepository.findAll();
+}
+
     public Booking saveBooking(Booking booking) {
         if (isConflict(booking)) {
             throw new RuntimeException("Time slot already booked for " + booking.getResourceName());
@@ -49,5 +53,6 @@ public class BookingService {
         }
         bookingRepository.deleteById(id);
     }
+
     
 }
