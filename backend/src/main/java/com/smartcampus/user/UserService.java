@@ -95,16 +95,15 @@ public class UserService {
                     return userOptional.get();
                 }
 
-                // User doesn't exist, create a new one
-                System.out.println("🌟 Creating brand new user: " + email);
-                User newUser = User.builder()
-                        .email(email)
-                        .name(name)
-                        .password(BCrypt.hashpw(UUID.randomUUID().toString(), BCrypt.gensalt()))
-                        .roles(List.of("USER"))
-                        .build();
-                return userRepository.save(newUser);
-            } else {
+	                // User doesn't exist, create a new one
+	                System.out.println("🌟 Creating brand new user: " + email);
+	                User newUser = new User();
+	                newUser.setEmail(email);
+	                newUser.setName(name);
+	                newUser.setPassword(BCrypt.hashpw(UUID.randomUUID().toString(), BCrypt.gensalt()));
+	                newUser.setRoles(List.of("USER"));
+	                return userRepository.save(newUser);
+	            } else {
                 System.out.println("❌ ID Token was verified but returned null!");
                 throw new RuntimeException("Invalid Google ID token.");
             }
