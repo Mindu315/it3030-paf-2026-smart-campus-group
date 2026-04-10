@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import BookingForm from './BookingForm';
-import BookingList from './BookingList';
+import BookingForm from '../../components/BookingForm';
+import BookingList from '../../components/BookingList';
 
 const BookingPage = () => {
     const [refresh, setRefresh] = useState(0);

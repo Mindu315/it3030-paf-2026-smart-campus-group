@@ -4,14 +4,14 @@ import {
   deleteResource,
   getAllResources,
   updateResource,
-} from '../api/resourceService'
-import { defaultResourceForm } from '../utils/ResourceConstants'
-import { validateResourceForm } from '../utils/ResourceValidation'
+} from '../../api/resourceService'
+import { defaultResourceForm } from '../../utils/ResourceConstants'
+import { validateResourceForm } from '../../utils/ResourceValidation'
 
-import ResourceTable from './Resources/ResourceTable'
-import ResourceForm from './Resources/ResourceForm'
-import ResourceDetailsModal from './Resources/ResourceDetailsModal'
-import ConfirmDeleteModal from './Resources/ConfirmDeleteModal'
+import ResourceTable from '../../components/Resources/ResourceTable'
+import ResourceForm from '../../components/Resources/ResourceForm'
+import ResourceDetailsModal from '../../components/Resources/ResourceDetailsModal'
+import ConfirmDeleteModal from '../../components/Resources/ConfirmDeleteModal'
 
 function ResourceManagement() {
   const [resources, setResources] = useState([])

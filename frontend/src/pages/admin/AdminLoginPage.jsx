@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, Lock, Mail } from 'lucide-react'
 
-import api from '../api/axiosConfig'
-import { getLandingRoute, saveUser } from '../utils/auth'
+import api from '../../api/axiosConfig'
+import { getLandingRoute, saveUser } from '../../utils/auth'
 
 const initialForm = {
   email: 'admin@smart.com',
@@ -138,4 +138,3 @@ function AdminLogin() {
 }
 
 export default AdminLogin
-

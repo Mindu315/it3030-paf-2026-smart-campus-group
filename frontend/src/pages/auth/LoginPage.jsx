@@ -1,8 +1,8 @@
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { GoogleLogin } from "@react-oauth/google"
-import api from "../api/axiosConfig"
-import { getLandingRoute, saveUser } from "../utils/auth"
+import api from "../../api/axiosConfig"
+import { getLandingRoute, saveUser } from "../../utils/auth"
 import { Eye, EyeOff, Mail, Lock } from "lucide-react"
 
 const initialForm = {

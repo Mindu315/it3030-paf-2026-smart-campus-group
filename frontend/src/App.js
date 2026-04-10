@@ -1,17 +1,17 @@
 import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom'
-import Admin from './components/Admin'
-import AdminBookingList from './components/AdminBookingList'
-import AdminLogin from './components/AdminLogin'
-import AdminSettingsPage from './components/AdminSettingsPage'
-import AdminUsersPage from './components/AdminUsersPage'
-import BookingHistory from './components/BookingHistory'
-import BookingPage from './components/BookingPage'
-import Home from './components/Home'
-import Login from './components/Login'
-import NotificationsPage from './components/NotificationsPage'
-import Register from './components/Register'
-import ResourceCatalog from './components/ResourceCatalog'
-import ResourceManagement from './components/ResourceManagement'
+import DashboardHome from './pages/HomePage'
+import Login from './pages/auth/LoginPage'
+import Register from './pages/auth/RegisterPage'
+import NotificationsPage from './pages/NotificationsPage'
+import BookingsPage from './pages/bookings/BookingsPage'
+import BookingHistory from './pages/bookings/BookingHistoryPage'
+import ResourceCatalog from './pages/resources/ResourceCatalogPage'
+import AdminDashboardPage from './pages/admin/AdminDashboardPage'
+import AdminLogin from './pages/admin/AdminLoginPage'
+import AdminUsersPage from './pages/admin/UsersPage'
+import AdminSettingsPage from './pages/admin/SettingsPage'
+import AdminBookingList from './pages/admin/ReviewBookingsPage'
+import ResourceManagement from './pages/admin/ResourceManagementPage'
 import DashboardLayout from './components/layout/DashboardLayout'
 import CreateTicketPage from './pages/tickets/CreateTicketPage'
 import EditTicketPage from './pages/tickets/EditTicketPage'
@@ -106,12 +106,12 @@ function App() {
 
           <Route element={<ProtectedRoute allowedRoles={['USER', 'ADMIN', 'TECHNICIAN']} />}>
             <Route element={<DashboardLayout />}>
-              <Route path="/home" element={<Home />} />
+              <Route path="/home" element={<DashboardHome />} />
               <Route path="/notifications" element={<NotificationsPage />} />
 
               <Route element={<ProtectedRoute allowedRoles={['USER']} />}>
                 <Route path="/resources" element={<ResourceCatalog />} />
-                <Route path="/bookings" element={<BookingPage />} />
+                <Route path="/bookings" element={<BookingsPage />} />
                 <Route path="/booking-history" element={<BookingHistory />} />
               </Route>
 
@@ -124,7 +124,7 @@ function App() {
               </Route>
 
               <Route element={<AdminOnlyRoute />}>
-                <Route path="/admin" element={<Admin />} />
+                <Route path="/admin" element={<AdminDashboardPage />} />
                 <Route path="/admin/users" element={<AdminUsersPage />} />
                 <Route path="/admin/settings" element={<AdminSettingsPage />} />
                 <Route path="/admin/review-bookings" element={<AdminBookingList />} />

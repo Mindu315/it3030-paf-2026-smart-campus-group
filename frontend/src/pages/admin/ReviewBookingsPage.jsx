@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { CheckCircle, XCircle, Clock, User, Building2, Inbox } from 'lucide-react';
-import BookingService from '../services/BookingService';
-import axios from 'axios';
+import BookingService from '../../services/BookingService';
 
 const AdminBookingList = () => {
     const [bookings, setBookings] = useState([]); 

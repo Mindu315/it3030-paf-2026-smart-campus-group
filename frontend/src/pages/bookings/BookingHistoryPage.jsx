@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Clock, Loader2, ArrowLeft, Trash2 } from 'lucide-react';
-import BookingService from '../services/BookingService';
+import BookingService from '../../services/BookingService';
 import { useNavigate } from 'react-router-dom';
 
 const BookingHistory = () => {

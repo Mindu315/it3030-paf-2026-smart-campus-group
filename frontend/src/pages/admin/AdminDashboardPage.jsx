@@ -11,7 +11,7 @@ import {
   UserCircle,
 } from "lucide-react"
 
-import { getCurrentUser } from "../utils/auth"
+import { getCurrentUser } from "../../utils/auth"
 
 function Admin() {
   const user = getCurrentUser()

@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react'
 import {
   filterResources,
   getAllResources,
-} from '../api/resourceService'
-import ResourceCard from './Resources/ResourceCard'
-import ResourceDetailsModal from './Resources/ResourceDetailsModal'
-import ResourceFilterBar from './Resources/ResourceFilterBar'
+} from '../../api/resourceService'
+import ResourceCard from '../../components/Resources/ResourceCard'
+import ResourceDetailsModal from '../../components/Resources/ResourceDetailsModal'
+import ResourceFilterBar from '../../components/Resources/ResourceFilterBar'
 
 const initialFilters = {
   type: '',
