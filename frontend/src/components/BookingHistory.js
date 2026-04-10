@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Clock, CheckCircle, Loader2, ArrowLeft, Trash2 } from 'lucide-react';
+import { Clock, Loader2, ArrowLeft, Trash2 } from 'lucide-react';
 import BookingService from '../services/BookingService';
 import { useNavigate } from 'react-router-dom';
 
@@ -7,21 +7,33 @@ const BookingHistory = () => {
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
+    const rawData = localStorage.getItem("smartCampusUser");
+    const savedUser = rawData ? JSON.parse(rawData) : null;
+    const studentId = savedUser?.studentId || savedUser?.id;
 
-    // 1. Define fetchHistory outside so it's accessible everywhere
-    const fetchHistory = useCallback(async () => {
+    const fetchMyBookings = useCallback(async () => {
+        if (!studentId) {
+            setBookings([]);
+            setLoading(false);
+            return;
+        }
+
         try {
-            const response = await BookingService.getAllBookings();
-            const sortedData = response.data.sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
+            const res = await BookingService.getBookingsByStudentId(studentId);
+            const sortedData = res.data.sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
             setBookings(sortedData);
-        } catch (error) {
-            console.error("Error fetching history:", error);
+        } catch (err) {
+            console.error("Booking fetch error:", err);
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [studentId]);
 
-    // 2. Define handleCancel outside useEffect
+    useEffect(() => {
+        fetchMyBookings();
+    }, [fetchMyBookings]);
+
+    // 3. Updated Handle Cancel
     const handleCancel = async (booking) => {
         const confirmMsg = booking.status === 'PENDING' 
             ? "Delete this pending request?" 
@@ -29,26 +41,23 @@ const BookingHistory = () => {
 
         if (window.confirm(confirmMsg)) {
             try {
+                // IMPORTANT: Ensure BookingService also sends the token if it's protected!
                 if (booking.status === 'PENDING') {
                     await BookingService.deleteBooking(booking.id);
                     alert("Request deleted successfully.");
                 } else {
                     await BookingService.updateStatus(booking.id, 'CANCELLED');
-                    alert("Booking cancelled. The record remains in your history.");
+                    alert("Booking cancelled.");
                 }
-                fetchHistory(); // Now this will work!
+                
+                // Refresh the list using our consolidated function
+                fetchMyBookings(); 
             } catch (error) {
                 console.error("Error during cancellation:", error);
-                alert("Action failed. Please try again.");
+                alert("Action failed. Check console for details.");
             }
         }
     };
-
-    // 3. Simple useEffect to trigger the initial load
-    useEffect(() => {
-        fetchHistory();
-    }, [fetchHistory]);
-
     if (loading) return <div className="flex justify-center p-10"><Loader2 className="animate-spin text-blue-500" /></div>;
 
     return (

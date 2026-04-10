@@ -1,3 +1,5 @@
+import React, { useState, useEffect } from 'react' // 1. Added React hooks
+import axios from 'axios' // 2. Need axios for fetching
 import { motion } from "framer-motion"
 import { Link, useNavigate } from "react-router-dom"
 import { clearCurrentUser } from "../utils/auth"
@@ -16,11 +18,20 @@ import {
 function DashboardHome() {
   const navigate = useNavigate()
 
+  const [unreadCount, setUnreadCount] = useState(0)
+  const [notifications, setNotifications] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  // --- THE FIX: Using the correct key 'smartCampusUser' ---
+  const rawData = localStorage.getItem("smartCampusUser");
+  const savedUser = rawData ? JSON.parse(rawData) : null;
+  const studentId = savedUser?.studentId || savedUser?.id;
+  const userName = savedUser?.name || "Student";
+  
   // Dummy data (replace later with API data)
   const stats = [
     { title: "Total Bookings", value: "12", icon: CalendarDays, color: "text-sky-600" },
     { title: "Active Tickets", value: "4", icon: ClipboardList, color: "text-emerald-600" },
-    { title: "Unread Notifications", value: "7", icon: Bell, color: "text-violet-600" },
+    { title: "Unread Notifications", value: unreadCount.toString(), icon: Bell, color: "text-violet-600" },
     { title: "Resources Available", value: "18", icon: Building2, color: "text-orange-600" },
   ]
 
@@ -31,16 +42,70 @@ function DashboardHome() {
     { message: "New comment added on your ticket", time: "2 days ago" },
   ]
 
+
   function handleLogout() {
-    // Clear centralized auth session key used by route guards.
-    clearCurrentUser()
-
-    // Also clear legacy keys if they exist.
-    localStorage.removeItem("user")
-    localStorage.removeItem("token")
-
-    navigate("/login", { replace: true })
+    clearCurrentUser();
+    // THE FIX: Clear the correct key on logout
+    localStorage.removeItem("smartCampusUser");
+    localStorage.removeItem("token");
+    navigate("/login", { replace: true });
   }
+
+// --- Replace your old 'const studentId = "STU_2026"' with this ---
+/*const savedUser = JSON.parse(localStorage.getItem("user"));
+console.log("DEBUG: Stored User Object:", savedUser); // <--- Add this
+const studentId = savedUser?.studentId || savedUser?.id; */
+
+
+console.log("DEBUG: Stored User Object:", savedUser); // <--- Add this
+
+useEffect(() => {
+    // Safety: If no user data is found, redirect to login
+    if (!savedUser) {
+      navigate("/login");
+      return;
+    }
+
+    const fetchNotifications = async () => {
+      try {
+        const countRes = await axios.get(`http://localhost:8081/api/notifications/unread-count/${studentId}`);
+        setUnreadCount(countRes.data);
+
+        const listRes = await axios.get(`http://localhost:8081/api/notifications/student/${studentId}`);
+        setNotifications(listRes.data);
+      } catch (err) {
+        console.error("Error fetching notifications:", err);
+      }
+    };
+
+    if (studentId) {
+      fetchNotifications();
+    }
+  }, [studentId, navigate, savedUser]);
+
+const handleToggleDropdown = async () => {
+    setShowDropdown(!showDropdown);
+
+    if (!showDropdown && unreadCount > 0) {
+      try {
+        const unreadItems = notifications.filter(note => !note.read);
+        await Promise.all(
+          unreadItems.map((note) => {
+            const notificationId = note.id || note._id;
+            if (notificationId) {
+              return axios.put(`http://localhost:8081/api/notifications/read/${notificationId}`);
+            }
+            return Promise.resolve();
+          })
+        );
+        setUnreadCount(0);
+      } catch (err) {
+        console.error("Failed to mark notifications as read:", err);
+        setUnreadCount(0); 
+      }
+    }
+  };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-sky-50">
@@ -94,13 +159,53 @@ function DashboardHome() {
               Tickets
             </Link>
 
-            <Link
-              to="/notifications"
-              className="flex items-center gap-3 rounded-xl px-4 py-3 text-slate-700 hover:bg-slate-100"
+            <div className="relative"> 
+            <button
+              onClick={handleToggleDropdown}
+              className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all ${
+                showDropdown ? "bg-sky-50 text-sky-700" : "text-slate-700 hover:bg-slate-100"
+              }`}
             >
-              <Bell size={18} />
+              <div className="relative">
+                <Bell size={18} />
+                {/* Red Dot Badge */}
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full bg-red-500 border-2 border-white"></span>
+                )}
+              </div>
               Notifications
-            </Link>
+            </button>
+
+            {/* Floating Dropdown Menu */}
+            {showDropdown && (
+              <div className="absolute left-full top-0 ml-4 w-72 rounded-2xl border border-slate-200 bg-white p-4 shadow-xl z-50">
+                <div className="flex items-center justify-between border-b pb-2 mb-2">
+                  <h4 className="text-sm font-bold text-slate-900">Recent Notifications</h4>
+                  <span className="text-[10px] bg-sky-100 text-sky-700 px-2 py-0.5 rounded-full font-bold">
+                    {unreadCount} New
+                  </span>
+                </div>
+                
+                <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
+                  {notifications.length === 0 ? (
+                    <p className="text-xs text-slate-500 text-center py-4">No new notifications</p>
+                  ) : (
+                    notifications.map((note, index) => (
+                      <div key={index} className="rounded-xl bg-slate-50 p-3 border border-slate-100">
+                        <div className="flex items-center gap-2 mb-1">
+                          <div className="h-1.5 w-1.5 rounded-full bg-red-500"></div>
+                          <p className="text-[10px] font-bold text-red-600 uppercase">Booking Rejected</p>
+                        </div>
+                        <p className="text-xs text-slate-700 leading-relaxed">
+                          {note.message}
+                        </p>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
           </nav>
 
           {/* Logout */}
@@ -139,10 +244,10 @@ function DashboardHome() {
               <UserCircle className="text-slate-500" size={28} />
 
               <div className="leading-tight">
-                <p className="text-sm font-semibold text-slate-800">Umi</p>
+                <p className="text-sm font-semibold text-slate-800">{userName}</p>
                 <p className="flex items-center gap-1 text-xs text-slate-500">
                   <ShieldCheck size={14} className="text-emerald-600" />
-                  USER ROLE
+                  {savedUser?.role || "STUDENT"}
                 </p>
               </div>
             </div>

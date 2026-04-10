@@ -14,15 +14,23 @@ const BookingService = {
         return axios.get(`${API_URL}/pending`);
     },
 
+    getBookingsByStudentId: (studentId) => {
+        return axios.get(`${API_URL}/student/${studentId}`);
+    },
+
+    getPendingBookingsByStudent: (studentId) => {
+        return axios.get(`${API_URL}/student/${studentId}/pending`);
+    },
+
     // 3. Delete a booking (The Cancel button logic)
     deleteBooking: (id) => {
         return axios.delete(`${API_URL}/${id}`);
     },
 
-    // Add this inside the BookingService object
-    updateStatus: (id, status) => {
-    return axios.put(`${API_URL}/${id}/status`, { status });
-},
+    // 4. Update booking status with optional reason
+    updateStatus: (id, status, reason = "") => {
+        return axios.put(`${API_URL}/${id}/status`, { status, reason });
+    },
 
     getAllBookings: () => {
         return axios.get(`${API_URL}/all`);

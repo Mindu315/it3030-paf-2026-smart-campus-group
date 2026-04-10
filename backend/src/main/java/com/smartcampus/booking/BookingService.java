@@ -1,7 +1,11 @@
 package com.smartcampus.booking;
+import com.smartcampus.notification.Notification;
+import com.smartcampus.notification.NotificationRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.lang.NonNull;
 
@@ -10,6 +14,9 @@ public class BookingService {
 
     @Autowired
     private BookingRepository bookingRepository;
+
+    @Autowired
+    private NotificationRepository notificationRepository; // Inject the new repository
 
     public List<Booking> findAllBookings() {
     return bookingRepository.findAll();
@@ -53,6 +60,39 @@ public class BookingService {
         }
         bookingRepository.deleteById(id);
     }
+
+    public List<Booking> getBookingsByStudentId(String studentId) {
+        // This assumes your BookingRepository has a method findByStudentId
+        return bookingRepository.findByStudentId(studentId);
+    }
+
+    public List<Booking> getBookingsByStudentIdAndStatus(String studentId, String status) {
+        return bookingRepository.findByStudentIdAndStatus(studentId, status);
+    }
+
+    public void updateBookingStatus(String id, String status, String reason) {
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+    booking.setStatus(status);
+    bookingRepository.save(booking);
+
+    // FIX: Use .equalsIgnoreCase() to ensure the check passes 
+    // This is much safer than == or .equals()
+    if ("REJECTED".equalsIgnoreCase(status)) {
+        System.out.println("DEBUG: Entering Notification Save logic..."); // Add this print!
+        
+        Notification notification = new Notification();
+        notification.setBookingId(id);
+        notification.setStudentId(booking.getStudentId());
+        notification.setMessage(reason);
+        notification.setTimestamp(LocalDateTime.now());
+        notification.setRead(false);
+
+        notificationRepository.save(notification);
+        System.out.println("DEBUG: Notification saved to MongoDB!"); // Add this print!
+    }
+}
 
     
 }

@@ -1,5 +1,6 @@
 package com.smartcampus.booking;
 
+import com.smartcampus.booking.dto.StatusRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,20 +24,39 @@ public class BookingController {
         }
     }
 
+    @PutMapping("/{id}/status")
+    public ResponseEntity<?> updateBookingStatus(
+        @PathVariable String id, 
+        @RequestBody StatusRequest request 
+    ) {
+        // This passes the ID, Status, and Reason to the Service
+        bookingService.updateBookingStatus(id, request.getStatus(), request.getReason());
+        
+        return ResponseEntity.ok("Status updated successfully and student notified");
+    }
+
+    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping("/pending")
     public List<Booking> getPending() {
         return bookingService.getPendingBookings();
     }
 
-   @PutMapping("/{id}/status")
-public ResponseEntity<Booking> updateStatus(
-    @PathVariable @NonNull String id, 
-    @RequestBody java.util.Map<String, String> payload // Change this line
-) {
-    String status = payload.get("status"); // Extract the status from the JSON body
-    Booking updatedBooking = bookingService.updateStatus(id, status);
-    return ResponseEntity.ok(updatedBooking);
-}
+    @GetMapping("/all")
+    public List<Booking> getAllBookings() {
+        return bookingService.findAllBookings();
+    }
+
+    @GetMapping("/student/{studentId}")
+    public ResponseEntity<List<Booking>> getBookingsByStudent(@PathVariable String studentId) {
+        List<Booking> studentBookings = bookingService.getBookingsByStudentId(studentId);
+        return ResponseEntity.ok(studentBookings);
+    }
+
+    @GetMapping("/student/{studentId}/pending")
+    public ResponseEntity<List<Booking>> getPendingBookingsForStudent(@PathVariable String studentId) {
+        List<Booking> studentPendingBookings = bookingService.getBookingsByStudentIdAndStatus(studentId, "PENDING");
+        return ResponseEntity.ok(studentPendingBookings);
+    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> cancelBooking(@PathVariable @NonNull String id) {
@@ -47,10 +67,4 @@ public ResponseEntity<Booking> updateStatus(
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-
-    @GetMapping("/all")
-    public List<Booking> getAllBookings() {
-    // This returns EVERY booking in the DB (Pending, Approved, Rejected)
-    return bookingService.findAllBookings(); 
-}
 }

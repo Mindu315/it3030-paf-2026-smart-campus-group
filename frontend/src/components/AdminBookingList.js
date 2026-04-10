@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { CheckCircle, XCircle, Clock, User, Building2, Inbox } from 'lucide-react';
 import BookingService from '../services/BookingService';
+import axios from 'axios';
 
 const AdminBookingList = () => {
     const [bookings, setBookings] = useState([]); 
@@ -21,6 +22,21 @@ const AdminBookingList = () => {
             setLoading(false);
         }
     };
+
+   const handleReject = async (id) => {
+    const adminReason = window.prompt("Please enter the reason for rejection:");
+    
+    if (adminReason) {
+        try {
+            await BookingService.updateStatus(id, "REJECTED", adminReason);
+            alert("Booking rejected successfully!");
+            loadAllBookings();
+        } catch (error) {
+            console.error("Update failed:", error);
+            alert("Could not update booking. Check if backend is running.");
+        }
+    }
+};
 
     // 2. FILTER LOGIC
     // This variable automatically updates whenever 'activeTab' or 'bookings' changes
@@ -100,10 +116,10 @@ const AdminBookingList = () => {
                                             <CheckCircle size={16} /> Approve
                                         </button>
                                         <button 
-                                            onClick={() => handleAction(b.id, 'REJECTED')}
-                                            className="px-4 py-2 bg-rose-50 text-rose-700 rounded-xl text-sm font-bold hover:bg-rose-100 transition flex items-center gap-2"
+                                            onClick={() => handleReject(b.id)} // <--- Make sure this name matches!
+                                            className="px-3 py-1 bg-rose-100 text-rose-600 rounded-lg hover:bg-rose-200"
                                         >
-                                            <XCircle size={16} /> Reject
+                                            Reject
                                         </button>
                                     </>
                                 ) : (

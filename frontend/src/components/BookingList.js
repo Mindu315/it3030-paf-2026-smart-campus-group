@@ -6,11 +6,21 @@ const BookingList = ({ refreshTrigger }) => {
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    // Fetch bookings from your Spring Boot API
+    const rawUser = localStorage.getItem("smartCampusUser");
+    const savedUser = rawUser ? JSON.parse(rawUser) : null;
+    const studentId = savedUser?.studentId || savedUser?.id;
+
+    // Fetch bookings for the logged-in student only
     const fetchBookings = async () => {
         setLoading(true);
+        if (!studentId) {
+            setBookings([]);
+            setLoading(false);
+            return;
+        }
+
         try {
-            const response = await BookingService.getPendingBookings();
+            const response = await BookingService.getPendingBookingsByStudent(studentId);
             setBookings(response.data);
         } catch (error) {
             console.error("Error fetching bookings:", error);

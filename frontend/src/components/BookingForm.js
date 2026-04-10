@@ -4,15 +4,23 @@ import { Calendar, Clock, Send, Info } from 'lucide-react';
 import BookingService from '../services/BookingService';
 
 const BookingForm = ({ onBookingAdded }) => {
+    const rawUser = localStorage.getItem("smartCampusUser");
+    const savedUser = rawUser ? JSON.parse(rawUser) : null;
+
     const [booking, setBooking] = useState({
-        studentId: 'STU_2026', // This can be replaced by actual user data later
-        studentName: 'Umi', 
+        studentId: savedUser?.studentId || savedUser?.id || "",
+        studentName: savedUser?.name || savedUser?.email || "",
         resourceName: '',
         startTime: '',
         endTime: ''
     });
 
     const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!booking.studentId || !booking.studentName) {
+            alert("You must be logged in to submit a booking.");
+            return;
+        }
         e.preventDefault();
         try {
             await BookingService.createBooking(booking);
@@ -48,9 +56,9 @@ const BookingForm = ({ onBookingAdded }) => {
                         onChange={(e) => setBooking({...booking, resourceName: e.target.value})}
                     >
                         <option value="">-- Choose --</option>
-                        <option value="Common Lab">Common Lab</option>
-                        <option value="Discussion Room B">Discussion Room B</option>
-                        <option value="Main Auditorium">Main Auditorium</option>
+                        <option value="Common Lab">Lab A</option>
+                        <option value="Discussion Room B">Lab B</option>
+                        <option value="Main Auditorium">conference Room A</option>
                     </select>
                 </div>
 
