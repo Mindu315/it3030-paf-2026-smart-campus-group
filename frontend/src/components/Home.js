@@ -63,7 +63,7 @@ function DashboardHome() {
           {/* Navigation */}
           <nav className="mt-10 space-y-2 text-sm font-medium">
             <Link
-              to="/dashboard"
+              to="/home"
               className="flex items-center gap-3 rounded-xl bg-sky-50 px-4 py-3 text-sky-700"
             >
               <LayoutDashboard size={18} />
@@ -249,7 +249,7 @@ function DashboardHome() {
                 </Link>
 
                 <Link
-                  to="/tickets/create"
+                  to="/tickets/new"
                   className="flex items-center justify-between rounded-2xl border border-slate-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700 hover:bg-emerald-100"
                 >
                   Report Incident

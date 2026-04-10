@@ -27,8 +27,11 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .requestMatchers("/uploads/**").permitAll()
                 .requestMatchers("/api/users/register", "/api/users/login").permitAll()
-                .anyRequest().authenticated()
+                // Temporary until JWT auth module is integrated.
+                .requestMatchers("/api/v1/**").permitAll()
+                .anyRequest().permitAll()
             );
         return http.build();
     }
@@ -41,7 +44,7 @@ public class SecurityConfig {
             "http://localhost:3001",
             "http://localhost:5173"
         ));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
 

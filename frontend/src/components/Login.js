@@ -28,7 +28,7 @@ function Login() {
     setIsSubmitting(true)
 
     try {
-      const response = await api.post("/users/login", formData)
+      const response = await api.post("/api/users/login", formData)
       const user = response.data
       saveUser(user)
       navigate(getLandingRoute(user), { replace: true })

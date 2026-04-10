@@ -3,6 +3,11 @@ import Admin from './components/Admin'
 import Home from './components/Home'
 import Login from './components/Login'
 import Register from './components/Register'
+import PlaceholderPage from './pages/PlaceholderPage'
+import CreateTicketPage from './pages/tickets/CreateTicketPage'
+import EditTicketPage from './pages/tickets/EditTicketPage'
+import TicketDetailPage from './pages/tickets/TicketDetailPage'
+import TicketListPage from './pages/tickets/TicketListPage'
 import { getLandingRoute, hasRole, isAuthenticated } from './utils/auth'
 
 function RootRedirect() {
@@ -68,10 +73,25 @@ function App() {
 
           <Route element={<ProtectedRoute allowedRoles={['USER', 'ADMIN']} />}>
             <Route path="/home" element={<Home />} />
+            <Route path="/resources" element={<PlaceholderPage title="Resources" />} />
+            <Route path="/bookings" element={<PlaceholderPage title="Bookings" />} />
+            <Route path="/bookings/create" element={<PlaceholderPage title="Create Booking" />} />
+            <Route path="/notifications" element={<PlaceholderPage title="Notifications" />} />
           </Route>
 
           <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
             <Route path="/admin" element={<Admin />} />
+            <Route path="/admin/users" element={<PlaceholderPage title="Manage Users" />} />
+            <Route path="/admin/bookings" element={<PlaceholderPage title="Review Bookings" />} />
+            <Route path="/admin/settings" element={<PlaceholderPage title="System Settings" />} />
+            <Route path="/admin/tickets" element={<TicketListPage />} />
+          </Route>
+
+          <Route element={<ProtectedRoute allowedRoles={['USER', 'ADMIN', 'TECHNICIAN']} />}>
+            <Route path="/tickets" element={<TicketListPage />} />
+            <Route path="/tickets/new" element={<CreateTicketPage />} />
+            <Route path="/tickets/:id" element={<TicketDetailPage />} />
+            <Route path="/tickets/:id/edit" element={<EditTicketPage />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />
