@@ -48,6 +48,18 @@ function ProtectedRoute({ allowedRoles }) {
   return <Outlet />
 }
 
+function AdminOnlyRoute() {
+  if (!isAuthenticated()) {
+    return <Navigate to="/admin/login" replace />
+  }
+
+  if (!hasRole('ADMIN')) {
+    return <Navigate to="/admin/login" replace />
+  }
+
+  return <Outlet />
+}
+
 function App() {
   return (
     <div className="min-h-screen bg-[var(--color-background)]">
@@ -100,11 +112,11 @@ function App() {
                 <Route path="/resources" element={<ResourceCatalog />} />
                 <Route path="/bookings" element={<BookingPage />} />
                 <Route path="/booking-history" element={<BookingHistory />} />
-                <Route path="/tickets" element={<TicketsPage />} />
-                <Route path="/tickets/create" element={<TicketCreatePage />} />
+              <Route path="/tickets" element={<TicketsPage />} />
+              <Route path="/tickets/create" element={<TicketCreatePage />} />
               </Route>
 
-              <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
+              <Route element={<AdminOnlyRoute />}>
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/admin/users" element={<AdminUsersPage />} />
                 <Route path="/admin/settings" element={<AdminSettingsPage />} />
