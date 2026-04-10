@@ -3,6 +3,7 @@ import Admin from './components/Admin'
 import Home from './components/Home'
 import Login from './components/Login'
 import Register from './components/Register'
+import AdminLogin from './components/AdminLogin'
 import AdminBookingList from './components/AdminBookingList'
 import BookingHistory from './components/BookingHistory'
 import BookingPage from './components/BookingPage'
@@ -49,8 +50,8 @@ function ProtectedRoute({ allowedRoles }) {
 
 function App() {
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_15%_10%,rgba(125,211,252,0.25),transparent_40%),radial-gradient(circle_at_85%_15%,rgba(110,231,183,0.18),transparent_42%)]" aria-hidden="true"></div>
+    <div className="min-h-screen bg-[var(--color-background)]">
+      <div className="pointer-events-none fixed inset-0 -z-10 opacity-60 bg-[radial-gradient(circle_at_15%_10%,rgba(33,75,167,0.20),transparent_40%),radial-gradient(circle_at_85%_15%,rgba(124,58,237,0.16),transparent_42%)]" aria-hidden="true"></div>
 
       <BrowserRouter>
         <Routes>
@@ -63,6 +64,17 @@ function App() {
               <section className="mx-auto flex min-h-screen max-w-6xl items-center justify-center px-4 py-8 sm:px-6 lg:px-8">
                 <PublicRoute>
                   <Login />
+                </PublicRoute>
+              </section>
+            )}
+          />
+
+          <Route
+            path="/admin/login"
+            element={(
+              <section className="mx-auto flex min-h-screen max-w-6xl items-center justify-center px-4 py-8 sm:px-6 lg:px-8">
+                <PublicRoute>
+                  <AdminLogin />
                 </PublicRoute>
               </section>
             )}

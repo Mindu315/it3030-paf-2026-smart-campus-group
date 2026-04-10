@@ -16,7 +16,7 @@ function DashboardLayout() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-[var(--color-background)] text-[var(--text-primary)]">
       <div className="flex min-h-screen">
         <div className="hidden md:block">
           <Sidebar />
@@ -59,4 +59,3 @@ function DashboardLayout() {
 }
 
 export default DashboardLayout
-

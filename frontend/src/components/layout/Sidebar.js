@@ -152,9 +152,9 @@ function Sidebar({ onNavigate }) {
   }
 
   return (
-    <aside className="flex h-full w-72 flex-col border-r border-slate-200 bg-white px-5 py-6">
+    <aside className="flex h-full w-72 flex-col border-r border-slate-200 bg-[var(--color-card)] px-5 py-6">
       <div className="flex items-center gap-3">
-        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-sky-600 shadow-md">
+        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--color-primary)] shadow-md">
           <span className="text-lg font-bold text-white">SC</span>
         </div>
         <div>
