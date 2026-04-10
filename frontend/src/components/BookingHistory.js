@@ -61,10 +61,9 @@ const BookingHistory = () => {
     if (loading) return <div className="flex justify-center p-10"><Loader2 className="animate-spin text-blue-500" /></div>;
 
     return (
-        <div className="min-h-screen bg-slate-50 p-8">
-            <div className="max-w-5xl mx-auto">
+        <section className="mx-auto max-w-5xl">
                 <button 
-                    onClick={() => navigate(-1)} 
+                    onClick={() => navigate('/home')} 
                     className="flex items-center gap-2 text-slate-500 hover:text-slate-800 mb-6 transition-colors"
                 >
                     <ArrowLeft size={20} /> Back to Dashboard
@@ -118,8 +117,7 @@ const BookingHistory = () => {
                         </table>
                     </div>
                 </div>
-            </div>
-        </div>
+        </section>
     );
 };
 

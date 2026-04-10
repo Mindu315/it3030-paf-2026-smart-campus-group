@@ -61,7 +61,7 @@ const AdminBookingList = () => {
     }, []);
 
     return (
-        <div className="max-w-5xl mx-auto mt-10 px-4">
+        <div className="max-w-5xl mx-auto px-0">
             {/* HEADER */}
             <div className="mb-6">
                 <h2 className="text-2xl font-bold text-slate-900">Booking Management</h2>

@@ -8,6 +8,13 @@ import BookingHistory from './components/BookingHistory'
 import BookingPage from './components/BookingPage'
 import ResourceCatalog from './components/ResourceCatalog'
 import ResourceManagement from './components/ResourceManagement'
+import AdminSettingsPage from './components/AdminSettingsPage'
+import AdminTicketsPage from './components/AdminTicketsPage'
+import AdminUsersPage from './components/AdminUsersPage'
+import NotificationsPage from './components/NotificationsPage'
+import TicketCreatePage from './components/TicketCreatePage'
+import TicketsPage from './components/TicketsPage'
+import DashboardLayout from './components/layout/DashboardLayout'
 import { getLandingRoute, hasRole, isAuthenticated } from './utils/auth'
 
 function RootRedirect() {
@@ -48,6 +55,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<RootRedirect />} />
+          <Route path="/dashboard" element={<Navigate to="/home" replace />} />
 
           <Route
             path="/login"
@@ -72,28 +80,28 @@ function App() {
           />
 
           <Route element={<ProtectedRoute allowedRoles={['USER', 'ADMIN']} />}>
-            <Route path="/home" element={<Home />} />
-            <Route path="/bookings" element={<BookingPage />} />
-            <Route path="/booking-history" element={<BookingHistory />} />
-          </Route>
+            <Route element={<DashboardLayout />}>
+              <Route path="/home" element={<Home />} />
+              <Route path="/notifications" element={<NotificationsPage />} />
 
-          <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/admin/review-bookings" element={
-              <div className="p-8 bg-slate-50 min-h-screen">
-                <AdminBookingList />
-              </div>
-            } />
-          </Route>
-          
+              <Route element={<ProtectedRoute allowedRoles={['USER']} />}>
+                <Route path="/resources" element={<ResourceCatalog />} />
+                <Route path="/bookings" element={<BookingPage />} />
+                <Route path="/booking-history" element={<BookingHistory />} />
+                <Route path="/tickets" element={<TicketsPage />} />
+                <Route path="/tickets/create" element={<TicketCreatePage />} />
+              </Route>
 
-          <Route element={<ProtectedRoute allowedRoles={['USER']} />}>
-            <Route path="/resources" element={<ResourceCatalog />} />
+              <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
+                <Route path="/admin" element={<Admin />} />
+                <Route path="/admin/users" element={<AdminUsersPage />} />
+                <Route path="/admin/settings" element={<AdminSettingsPage />} />
+                <Route path="/admin/review-bookings" element={<AdminBookingList />} />
+                <Route path="/admin/resources" element={<ResourceManagement />} />
+                <Route path="/admin/tickets" element={<AdminTicketsPage />} />
+              </Route>
+            </Route>
           </Route>
-
-	          <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
-	            <Route path="/admin/resources" element={<ResourceManagement />} />
-	          </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

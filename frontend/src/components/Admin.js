@@ -1,4 +1,4 @@
-import { useNavigate, Link } from "react-router-dom"
+import { Link } from "react-router-dom"
 import { motion } from "framer-motion"
 import {
   Users,
@@ -8,20 +8,13 @@ import {
   Settings,
   Bell,
   ArrowUpRight,
-  LogOut,
   UserCircle,
 } from "lucide-react"
 
-import { clearCurrentUser, getCurrentUser } from "../utils/auth"
+import { getCurrentUser } from "../utils/auth"
 
 function Admin() {
-  const navigate = useNavigate()
   const user = getCurrentUser()
-
-  function handleLogout() {
-    clearCurrentUser()
-    navigate("/login", { replace: true })
-  }
 
   const stats = [
     {
@@ -62,8 +55,7 @@ function Admin() {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50">
-      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+    <section className="mx-auto max-w-6xl">
         
         {/* Header */}
         <motion.header
@@ -96,14 +88,6 @@ function Admin() {
                 <p className="text-xs font-semibold text-indigo-600">ADMIN</p>
               </div>
             </div>
-
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 rounded-2xl bg-rose-600 px-5 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-rose-700"
-            >
-              <LogOut size={18} />
-              Logout
-            </button>
           </div>
         </motion.header>
 
@@ -266,8 +250,7 @@ function Admin() {
         <p className="mt-12 text-center text-xs text-slate-400">
           © {new Date().getFullYear()} Smart Campus Operations Hub — Admin Panel
         </p>
-      </div>
-    </div>
+    </section>
   )
 }
 

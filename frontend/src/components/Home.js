@@ -2,14 +2,11 @@ import React, { useState, useEffect } from 'react' // 1. Added React hooks
 import axios from 'axios' // 2. Need axios for fetching
 import { motion } from "framer-motion"
 import { Link, useNavigate } from "react-router-dom"
-import { clearCurrentUser } from "../utils/auth"
 import {
-  LayoutDashboard,
   CalendarDays,
   ClipboardList,
   Bell,
   Building2,
-  LogOut,
   UserCircle,
   ShieldCheck,
   ArrowUpRight,
@@ -19,8 +16,6 @@ function DashboardHome() {
   const navigate = useNavigate()
 
   const [unreadCount, setUnreadCount] = useState(0)
-  const [notifications, setNotifications] = useState([]);
-  const [showDropdown, setShowDropdown] = useState(false);
   // --- THE FIX: Using the correct key 'smartCampusUser' ---
   const rawData = localStorage.getItem("smartCampusUser");
   const savedUser = rawData ? JSON.parse(rawData) : null;
@@ -43,14 +38,6 @@ function DashboardHome() {
   ]
 
 
-  function handleLogout() {
-    clearCurrentUser();
-    // THE FIX: Clear the correct key on logout
-    localStorage.removeItem("smartCampusUser");
-    localStorage.removeItem("token");
-    navigate("/login", { replace: true });
-  }
-
 // --- Replace your old 'const studentId = "STU_2026"' with this ---
 /*const savedUser = JSON.parse(localStorage.getItem("user"));
 console.log("DEBUG: Stored User Object:", savedUser); // <--- Add this
@@ -65,9 +52,6 @@ const fetchNotifications = async () => {
     try {
       const countRes = await axios.get(`http://localhost:8081/api/notifications/unread-count/${studentId}`);
       setUnreadCount(countRes.data);
-
-      const listRes = await axios.get(`http://localhost:8081/api/notifications/student/${studentId}`);
-      setNotifications(listRes.data);
     } catch (err) {
       console.error("Error fetching notifications:", err);
     }
@@ -83,151 +67,9 @@ useEffect(() => {
     fetchNotifications();
   }, [studentId, navigate, savedUser]);
 
-const handleToggleDropdown = async () => {
-    const nextState = !showDropdown;
-    setShowDropdown(nextState);
-
-    if (nextState && studentId) {
-      await fetchNotifications();
-
-      const unreadItems = notifications.filter(note => !note.read);
-      if (unreadItems.length === 0) return;
-
-      try {
-        await Promise.all(
-          unreadItems.map((note) => {
-            const notificationId = note.id || note._id;
-            if (notificationId) {
-              return axios.put(`http://localhost:8081/api/notifications/read/${notificationId}`);
-            }
-            return Promise.resolve();
-          })
-        );
-        setUnreadCount(0);
-        setNotifications(prev => prev.map(note => ({ ...note, read: true })));
-      } catch (err) {
-        console.error("Failed to mark notifications as read:", err);
-      }
-    }
-  };
-
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-sky-50">
-      <div className="flex">
-
-        {/* Sidebar */}
-        <aside className="hidden min-h-screen w-72 flex-col border-r border-slate-200 bg-white px-6 py-6 md:flex">
-          
-          {/* Logo */}
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-sky-600 shadow-md">
-              <span className="text-lg font-bold text-white">SC</span>
-            </div>
-            <div>
-              <h1 className="text-sm font-bold text-slate-900">Smart Campus Hub</h1>
-              <p className="text-xs text-slate-500">Dashboard</p>
-            </div>
-          </div>
-
-          {/* Navigation */}
-          <nav className="mt-10 space-y-2 text-sm font-medium">
-            <Link
-              to="/dashboard"
-              className="flex items-center gap-3 rounded-xl bg-sky-50 px-4 py-3 text-sky-700"
-            >
-              <LayoutDashboard size={18} />
-              Dashboard
-            </Link>
-
-            <Link
-              to="/resources"
-              className="flex items-center gap-3 rounded-xl px-4 py-3 text-slate-700 hover:bg-slate-100"
-            >
-              <Building2 size={18} />
-              Resources
-            </Link>
-
-            <Link
-              to="/bookings"
-              className="flex items-center gap-3 rounded-xl px-4 py-3 text-slate-700 hover:bg-slate-100"
-            >
-              <CalendarDays size={18} />
-              Bookings
-            </Link>
-
-            <Link
-              to="/tickets"
-              className="flex items-center gap-3 rounded-xl px-4 py-3 text-slate-700 hover:bg-slate-100"
-            >
-              <ClipboardList size={18} />
-              Tickets
-            </Link>
-
-            <div className="relative"> 
-            <button
-              onClick={handleToggleDropdown}
-              className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all ${
-                showDropdown ? "bg-sky-50 text-sky-700" : "text-slate-700 hover:bg-slate-100"
-              }`}
-            >
-              <div className="relative">
-                <Bell size={18} />
-                {unreadCount > 0 && (
-                  <span className="absolute -top-2 -right-2 flex h-5 min-w-[1.2rem] items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-bold text-white border-2 border-white">
-                    {unreadCount}
-                  </span>
-                )}
-              </div>
-              Notifications
-            </button>
-
-            {/* Floating Dropdown Menu */}
-            {showDropdown && (
-              <div className="absolute left-full top-0 ml-4 w-72 rounded-2xl border border-slate-200 bg-white p-4 shadow-xl z-50">
-                <div className="flex items-center justify-between border-b pb-2 mb-2">
-                  <h4 className="text-sm font-bold text-slate-900">Recent Notifications</h4>
-                  <span className="text-[10px] bg-sky-100 text-sky-700 px-2 py-0.5 rounded-full font-bold">
-                    {unreadCount} New
-                  </span>
-                </div>
-                
-                <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
-                  {notifications.length === 0 ? (
-                    <p className="text-xs text-slate-500 text-center py-4">No new notifications</p>
-                  ) : (
-                    notifications.map((note, index) => (
-                      <div key={index} className="rounded-xl bg-slate-50 p-3 border border-slate-100">
-                        <div className="flex items-center gap-2 mb-1">
-                          <div className="h-1.5 w-1.5 rounded-full bg-red-500"></div>
-                          <p className="text-[10px] font-bold text-red-600 uppercase">Booking Rejected</p>
-                        </div>
-                        <p className="text-xs text-slate-700 leading-relaxed">
-                          {note.message}
-                        </p>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-          </nav>
-
-          {/* Logout */}
-          <div className="mt-auto pt-6">
-            <button
-              onClick={handleLogout}
-              className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-rose-600 hover:bg-rose-50"
-            >
-              <LogOut size={18} />
-              Logout
-            </button>
-          </div>
-        </aside>
-
-        {/* Main */}
-        <main className="flex-1 px-6 py-8">
+    <div className="mx-auto max-w-7xl px-0 py-0">
 
           {/* Top Bar */}
           <motion.div
@@ -383,19 +225,8 @@ const handleToggleDropdown = async () => {
                   <ArrowUpRight size={16} />
                 </Link>
               </div>
-
-              {/* Logout Button inside main (mobile friendly) */}
-              <button
-                onClick={handleLogout}
-                className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700 hover:bg-rose-100 md:hidden"
-              >
-                <LogOut size={18} />
-                Logout
-              </button>
             </motion.div>
           </div>
-        </main>
-      </div>
     </div>
   )
 }

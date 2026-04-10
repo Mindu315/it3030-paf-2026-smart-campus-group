@@ -6,8 +6,7 @@ const BookingPage = () => {
     const [refresh, setRefresh] = useState(0);
 
     return (
-        <div className="min-h-screen bg-slate-50 p-8">
-            <div className="max-w-7xl mx-auto">
+        <section className="mx-auto max-w-7xl">
                 {/* We use a heading that matches the teammate's style */}
                 <h1 className="text-2xl font-bold text-slate-900 mb-8">Campus Resource Booking</h1>
                 
@@ -19,8 +18,7 @@ const BookingPage = () => {
                         <BookingList refreshTrigger={refresh} />
                     </div>
                 </div>
-            </div>
-        </div>
+        </section>
     );
 };
 
