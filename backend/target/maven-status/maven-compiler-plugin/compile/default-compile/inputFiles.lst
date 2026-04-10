@@ -1,0 +1,17 @@
+C:\Users\HP\Desktop\it3030-paf-2026-smart-campus-group\backend\src\main\java\com\smartcampus\resource\controller\DebugController.java
+C:\Users\HP\Desktop\it3030-paf-2026-smart-campus-group\backend\src\main\java\com\smartcampus\resource\controller\HomeController.java
+C:\Users\HP\Desktop\it3030-paf-2026-smart-campus-group\backend\src\main\java\com\smartcampus\resource\controller\ResourceController.java
+C:\Users\HP\Desktop\it3030-paf-2026-smart-campus-group\backend\src\main\java\com\smartcampus\resource\dto\ResourceRequestDto.java
+C:\Users\HP\Desktop\it3030-paf-2026-smart-campus-group\backend\src\main\java\com\smartcampus\resource\dto\ResourceResponseDto.java
+C:\Users\HP\Desktop\it3030-paf-2026-smart-campus-group\backend\src\main\java\com\smartcampus\resource\exception\GlobalExceptionHandler.java
+C:\Users\HP\Desktop\it3030-paf-2026-smart-campus-group\backend\src\main\java\com\smartcampus\resource\exception\ResourceNotFoundException.java
+C:\Users\HP\Desktop\it3030-paf-2026-smart-campus-group\backend\src\main\java\com\smartcampus\resource\model\Resource.java
+C:\Users\HP\Desktop\it3030-paf-2026-smart-campus-group\backend\src\main\java\com\smartcampus\resource\repository\ResourceRepository.java
+C:\Users\HP\Desktop\it3030-paf-2026-smart-campus-group\backend\src\main\java\com\smartcampus\resource\service\impl\ResourceServiceImpl.java
+C:\Users\HP\Desktop\it3030-paf-2026-smart-campus-group\backend\src\main\java\com\smartcampus\resource\service\ResourceService.java
+C:\Users\HP\Desktop\it3030-paf-2026-smart-campus-group\backend\src\main\java\com\smartcampus\security\SecurityConfig.java
+C:\Users\HP\Desktop\it3030-paf-2026-smart-campus-group\backend\src\main\java\com\smartcampus\SmartCampusApplication.java
+C:\Users\HP\Desktop\it3030-paf-2026-smart-campus-group\backend\src\main\java\com\smartcampus\user\User.java
+C:\Users\HP\Desktop\it3030-paf-2026-smart-campus-group\backend\src\main\java\com\smartcampus\user\UserController.java
+C:\Users\HP\Desktop\it3030-paf-2026-smart-campus-group\backend\src\main\java\com\smartcampus\user\UserRepository.java
+C:\Users\HP\Desktop\it3030-paf-2026-smart-campus-group\backend\src\main\java\com\smartcampus\user\UserService.java

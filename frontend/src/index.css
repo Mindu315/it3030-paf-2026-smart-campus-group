@@ -6,8 +6,19 @@
 
 @layer base {
 	:root {
-		color: #0f172a;
-		background-color: #f8fafc;
+		/* Palette variables provided by user */
+		--color-primary: #214ba7; /* Primary Blue */
+		--color-secondary: #1E40AF; /* Secondary Blue */
+		--color-accent: #7C3AED; /* Purple Accent */
+		--color-light-purple: #EDE9FE; /* Light Purple */
+		--color-background: #F8FAFC; /* Background */
+		--color-card: #FFFFFF; /* Card */
+		--text-primary: #1E293B; /* Text Primary */
+		--text-secondary: #64748B; /* Text Secondary */
+		--gradient: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+
+		color: var(--text-primary);
+		background-color: var(--color-background);
 	}
 
 	* {

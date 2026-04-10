@@ -1,9 +1,9 @@
 package com.smartcampus.user;
 
+import java.util.List;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.util.List;
 
 @Document(collection = "users")
 public class User {
@@ -12,11 +12,9 @@ public class User {
     private String name;
     private String email;
     private String password;
-    private List<String> roles;
+    private List<String> roles = List.of("USER");
 
-    public User() {
-        this.roles = List.of("USER");
-    }
+    public User() {}
 
     public User(String id, String name, String email, String password, List<String> roles) {
         this.id = id;
