@@ -3,6 +3,9 @@ import Admin from './components/Admin'
 import Home from './components/Home'
 import Login from './components/Login'
 import Register from './components/Register'
+import BookingPage from './components/BookingPage';
+import AdminBookingList from './components/AdminBookingList';
+import BookingHistory from './components/BookingHistory';
 import { getLandingRoute, hasRole, isAuthenticated } from './utils/auth'
 
 function RootRedirect() {
@@ -68,11 +71,19 @@ function App() {
 
           <Route element={<ProtectedRoute allowedRoles={['USER', 'ADMIN']} />}>
             <Route path="/home" element={<Home />} />
+            <Route path="/bookings" element={<BookingPage />} />
+            <Route path="/booking-history" element={<BookingHistory />} />
           </Route>
 
           <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
             <Route path="/admin" element={<Admin />} />
+            <Route path="/admin/review-bookings" element={
+              <div className="p-8 bg-slate-50 min-h-screen">
+                <AdminBookingList />
+              </div>
+            } />
           </Route>
+          
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

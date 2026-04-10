@@ -216,7 +216,7 @@ function Admin() {
               </Link>
 
               <Link
-                to="/admin/bookings"
+                to="/admin/review-bookings"
                 className="flex items-center justify-between rounded-2xl border border-slate-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700 hover:bg-emerald-100"
               >
                 <span className="flex items-center gap-2">

@@ -28,6 +28,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/api/users/register", "/api/users/login").permitAll()
+                .requestMatchers("/api/bookings/**").permitAll() 
+                .requestMatchers("/api/notifications/**").permitAll()
                 .anyRequest().authenticated()
             );
         return http.build();
