@@ -41,6 +41,15 @@ public class UserService {
         return userRepository.findAll(); // This grabs every user document from MongoDB!
     }
 
+    //Delete user by ID (admin only)
+    
+    public void deleteUser(String userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new RuntimeException("User not found!");
+        }
+        userRepository.deleteById(userId);
+    }
+
     public User authenticateUser(String email, String password) {
         Optional<User> userOptional = userRepository.findByEmail(email);
 
