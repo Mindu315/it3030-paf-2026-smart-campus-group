@@ -30,7 +30,7 @@ function Register() {
     setIsSubmitting(true)
 
     try {
-      await api.post("/users/register", formData)
+      await api.post("/api/users/register", formData)
 
       setSuccess("Account created successfully. Redirecting to login...")
       setFormData(initialForm)

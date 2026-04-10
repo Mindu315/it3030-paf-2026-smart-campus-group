@@ -1,21 +1,22 @@
 import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom'
 import Admin from './components/Admin'
-import Home from './components/Home'
-import Login from './components/Login'
-import Register from './components/Register'
-import AdminLogin from './components/AdminLogin'
 import AdminBookingList from './components/AdminBookingList'
+import AdminLogin from './components/AdminLogin'
+import AdminSettingsPage from './components/AdminSettingsPage'
+import AdminUsersPage from './components/AdminUsersPage'
 import BookingHistory from './components/BookingHistory'
 import BookingPage from './components/BookingPage'
+import Home from './components/Home'
+import Login from './components/Login'
+import NotificationsPage from './components/NotificationsPage'
+import Register from './components/Register'
 import ResourceCatalog from './components/ResourceCatalog'
 import ResourceManagement from './components/ResourceManagement'
-import AdminSettingsPage from './components/AdminSettingsPage'
-import AdminTicketsPage from './components/AdminTicketsPage'
-import AdminUsersPage from './components/AdminUsersPage'
-import NotificationsPage from './components/NotificationsPage'
-import TicketCreatePage from './components/TicketCreatePage'
-import TicketsPage from './components/TicketsPage'
 import DashboardLayout from './components/layout/DashboardLayout'
+import CreateTicketPage from './pages/tickets/CreateTicketPage'
+import EditTicketPage from './pages/tickets/EditTicketPage'
+import TicketDetailPage from './pages/tickets/TicketDetailPage'
+import TicketListPage from './pages/tickets/TicketListPage'
 import { getLandingRoute, hasRole, isAuthenticated } from './utils/auth'
 
 function RootRedirect() {
@@ -103,7 +104,7 @@ function App() {
             )}
           />
 
-          <Route element={<ProtectedRoute allowedRoles={['USER', 'ADMIN']} />}>
+          <Route element={<ProtectedRoute allowedRoles={['USER', 'ADMIN', 'TECHNICIAN']} />}>
             <Route element={<DashboardLayout />}>
               <Route path="/home" element={<Home />} />
               <Route path="/notifications" element={<NotificationsPage />} />
@@ -112,8 +113,14 @@ function App() {
                 <Route path="/resources" element={<ResourceCatalog />} />
                 <Route path="/bookings" element={<BookingPage />} />
                 <Route path="/booking-history" element={<BookingHistory />} />
-              <Route path="/tickets" element={<TicketsPage />} />
-              <Route path="/tickets/create" element={<TicketCreatePage />} />
+              </Route>
+
+              <Route element={<ProtectedRoute allowedRoles={['USER', 'ADMIN', 'TECHNICIAN']} />}>
+                <Route path="/tickets" element={<TicketListPage />} />
+                <Route path="/tickets/new" element={<CreateTicketPage />} />
+                <Route path="/tickets/create" element={<Navigate to="/tickets/new" replace />} />
+                <Route path="/tickets/:id" element={<TicketDetailPage />} />
+                <Route path="/tickets/:id/edit" element={<EditTicketPage />} />
               </Route>
 
               <Route element={<AdminOnlyRoute />}>
@@ -121,8 +128,9 @@ function App() {
                 <Route path="/admin/users" element={<AdminUsersPage />} />
                 <Route path="/admin/settings" element={<AdminSettingsPage />} />
                 <Route path="/admin/review-bookings" element={<AdminBookingList />} />
+                <Route path="/admin/bookings" element={<Navigate to="/admin/review-bookings" replace />} />
                 <Route path="/admin/resources" element={<ResourceManagement />} />
-                <Route path="/admin/tickets" element={<AdminTicketsPage />} />
+                <Route path="/admin/tickets" element={<TicketListPage />} />
               </Route>
             </Route>
           </Route>

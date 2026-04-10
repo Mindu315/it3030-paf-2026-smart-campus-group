@@ -27,12 +27,14 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers("/api/users/**").permitAll()
+                .requestMatchers("/uploads/**").permitAll()
                 .requestMatchers("/api/admin/login").permitAll()
+                .requestMatchers("/api/users/**").permitAll()
                 .requestMatchers("/", "/api/resources/**", "/api/debug/**").permitAll()
                 .requestMatchers("/api/bookings/**").permitAll()
                 .requestMatchers("/api/notifications/**").permitAll()
-                .anyRequest().authenticated()
+                .requestMatchers("/api/v1/**").permitAll()
+                .anyRequest().permitAll()
             );
         return http.build();
     }
@@ -45,7 +47,7 @@ public class SecurityConfig {
             "http://localhost:3001",
             "http://localhost:5173"
         ));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
 

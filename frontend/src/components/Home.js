@@ -202,7 +202,7 @@ useEffect(() => {
                 </button>
 
                 <Link
-                  to="/tickets/create"
+                  to="/tickets/new"
                   className="flex items-center justify-between rounded-2xl border border-slate-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700 hover:bg-emerald-100"
                 >
                   Report Incident
