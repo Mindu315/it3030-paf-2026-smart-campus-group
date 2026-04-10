@@ -37,10 +37,14 @@ export function clearCurrentUser() {
 }
 
 export function isAuthenticated() {
-  return Boolean(getCurrentUser())
+  return Boolean(getCurrentUser() || localStorage.getItem('token'))
 }
 
 export function hasRole(targetRole) {
+  const fallbackRole = localStorage.getItem('role')
+  if (!getCurrentUser() && fallbackRole) {
+    return String(fallbackRole).toUpperCase() === String(targetRole).toUpperCase()
+  }
   const user = getCurrentUser()
   const roles = normalizeRoles(user?.roles)
   const normalizedTarget = String(targetRole).toUpperCase()
