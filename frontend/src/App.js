@@ -80,7 +80,7 @@ function App() {
             <Route path="/resources" element={<ResourceCatalog />} />
           </Route>
 
-          <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
+          <Route element={<ProtectedRoute allowedRoles={['USER']} />}>
             <Route path="/admin/resources" element={<ResourceManagement />} />
           </Route>
 
