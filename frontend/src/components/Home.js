@@ -59,6 +59,20 @@ const studentId = savedUser?.studentId || savedUser?.id; */
 
 console.log("DEBUG: Stored User Object:", savedUser); // <--- Add this
 
+const fetchNotifications = async () => {
+    if (!studentId) return;
+
+    try {
+      const countRes = await axios.get(`http://localhost:8081/api/notifications/unread-count/${studentId}`);
+      setUnreadCount(countRes.data);
+
+      const listRes = await axios.get(`http://localhost:8081/api/notifications/student/${studentId}`);
+      setNotifications(listRes.data);
+    } catch (err) {
+      console.error("Error fetching notifications:", err);
+    }
+  };
+
 useEffect(() => {
     // Safety: If no user data is found, redirect to login
     if (!savedUser) {
@@ -66,29 +80,20 @@ useEffect(() => {
       return;
     }
 
-    const fetchNotifications = async () => {
-      try {
-        const countRes = await axios.get(`http://localhost:8081/api/notifications/unread-count/${studentId}`);
-        setUnreadCount(countRes.data);
-
-        const listRes = await axios.get(`http://localhost:8081/api/notifications/student/${studentId}`);
-        setNotifications(listRes.data);
-      } catch (err) {
-        console.error("Error fetching notifications:", err);
-      }
-    };
-
-    if (studentId) {
-      fetchNotifications();
-    }
+    fetchNotifications();
   }, [studentId, navigate, savedUser]);
 
 const handleToggleDropdown = async () => {
-    setShowDropdown(!showDropdown);
+    const nextState = !showDropdown;
+    setShowDropdown(nextState);
 
-    if (!showDropdown && unreadCount > 0) {
+    if (nextState && studentId) {
+      await fetchNotifications();
+
+      const unreadItems = notifications.filter(note => !note.read);
+      if (unreadItems.length === 0) return;
+
       try {
-        const unreadItems = notifications.filter(note => !note.read);
         await Promise.all(
           unreadItems.map((note) => {
             const notificationId = note.id || note._id;
@@ -99,9 +104,9 @@ const handleToggleDropdown = async () => {
           })
         );
         setUnreadCount(0);
+        setNotifications(prev => prev.map(note => ({ ...note, read: true })));
       } catch (err) {
         console.error("Failed to mark notifications as read:", err);
-        setUnreadCount(0); 
       }
     }
   };
@@ -168,9 +173,10 @@ const handleToggleDropdown = async () => {
             >
               <div className="relative">
                 <Bell size={18} />
-                {/* Red Dot Badge */}
                 {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full bg-red-500 border-2 border-white"></span>
+                  <span className="absolute -top-2 -right-2 flex h-5 min-w-[1.2rem] items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-bold text-white border-2 border-white">
+                    {unreadCount}
+                  </span>
                 )}
               </div>
               Notifications
