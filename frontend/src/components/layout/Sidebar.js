@@ -9,10 +9,13 @@ import {
   Ticket,
   Users,
   Bell,
+  UserCircle,
   Building2,
 } from 'lucide-react'
 
-import { clearCurrentUser, hasRole } from '../../utils/auth'
+import { clearCurrentUser, hasRole, getCurrentUser } from '../../utils/auth'
+import NotificationService from '../../services/notificationService'
+import { useEffect, useState } from 'react'
 
 function buildNav() {
   const items = []
@@ -22,7 +25,7 @@ function buildNav() {
     to: '/home',
     label: 'Dashboard',
     Icon: LayoutDashboard,
-    roles: ['USER', 'ADMIN'],
+    roles: ['USER'],
   })
 
   items.push({
@@ -62,7 +65,15 @@ function buildNav() {
     to: '/notifications',
     label: 'Notifications',
     Icon: Bell,
-    roles: ['USER', 'ADMIN'],
+    roles: ['USER', 'ADMIN',],
+  })
+
+  items.push({
+    key: 'profile',
+    to: '/profile',
+    label: 'Profile',
+    Icon: UserCircle,
+    roles: ['USER'],
   })
 
   items.push({ key: 'divider-admin', type: 'divider', roles: ['ADMIN'] })
@@ -72,14 +83,6 @@ function buildNav() {
     to: '/admin',
     label: 'Admin Dashboard',
     Icon: ClipboardList,
-    roles: ['ADMIN'],
-  })
-
-  items.push({
-    key: 'admin-users',
-    to: '/admin/users',
-    label: 'Manage Users',
-    Icon: Users,
     roles: ['ADMIN'],
   })
 
@@ -121,7 +124,7 @@ function buildNav() {
   })
 }
 
-function SidebarLink({ Icon, label, to, onNavigate }) {
+function SidebarLink({ Icon, label, to, onNavigate, badge }) {
   return (
     <NavLink
       to={to}
@@ -137,6 +140,11 @@ function SidebarLink({ Icon, label, to, onNavigate }) {
     >
       <Icon size={18} className="text-slate-500 group-hover:text-slate-700" />
       <span className="truncate">{label}</span>
+      {badge > 0 && (
+        <span className="ml-auto inline-flex items-center rounded-full bg-rose-600 px-2 py-0.5 text-xs font-semibold text-white">
+          {badge}
+        </span>
+      )}
     </NavLink>
   )
 }
@@ -144,6 +152,22 @@ function SidebarLink({ Icon, label, to, onNavigate }) {
 function Sidebar({ onNavigate }) {
   const navigate = useNavigate()
   const nav = buildNav()
+  const [unread, setUnread] = useState(0)
+
+  useEffect(() => {
+    const user = getCurrentUser()
+    const uid = user?.studentId || user?.id
+    if (!uid) return
+    NotificationService.getUnreadCount(uid)
+      .then((res) => setUnread(res.data ?? 0))
+      .catch(() => setUnread(0))
+
+    const handler = (e) => {
+      setUnread(e.detail?.unreadCount ?? 0)
+    }
+    window.addEventListener('notificationsUpdated', handler)
+    return () => window.removeEventListener('notificationsUpdated', handler)
+  }, [])
 
   const handleLogout = () => {
     clearCurrentUser()
@@ -183,6 +207,7 @@ function Sidebar({ onNavigate }) {
               label={item.label}
               Icon={item.Icon}
               onNavigate={onNavigate}
+              badge={item.key === 'notifications' ? unread : 0}
             />
           )
         })}

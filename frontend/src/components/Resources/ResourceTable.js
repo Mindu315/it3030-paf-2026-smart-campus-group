@@ -84,7 +84,7 @@ function ResourceTable({ resources, onView, onEdit, onDelete }) {
                     <button
                       type="button"
                       onClick={() => onDelete(resource)}
-                      className="rounded-lg bg-red-100 px-3 py-1.5 text-xs font-medium text-red-700 transition hover:bg-red-200"
+                      className="rounded-lg btn-delete px-3 py-1.5 text-xs font-medium transition"
                     >
                       Delete
                     </button>

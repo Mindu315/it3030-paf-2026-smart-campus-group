@@ -15,6 +15,8 @@ import com.smartcampus.user.UserRepository;
 import com.smartcampus.util.CurrentUser;
 import com.smartcampus.util.FileStorageService;
 import lombok.RequiredArgsConstructor;
+import com.smartcampus.notification.Notification;
+import com.smartcampus.notification.NotificationRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -32,6 +34,7 @@ public class TicketServiceImpl implements TicketService {
     private final TicketRepository ticketRepository;
     private final FileStorageService fileStorageService;
     private final UserRepository userRepository;
+    private final NotificationRepository notificationRepository;
 
     @Override
     public Ticket createTicket(TicketCreateRequest request, MultipartFile[] attachments, CurrentUser currentUser) {
@@ -59,7 +62,18 @@ public class TicketServiceImpl implements TicketService {
         Ticket saved = ticketRepository.save(ticket);
         List<String> urls = fileStorageService.storeTicketAttachments(saved.getId(), attachments, 0);
         saved.getAttachmentUrls().addAll(urls);
-        return ticketRepository.save(saved);
+        Ticket finalSaved = ticketRepository.save(saved);
+        try {
+            Notification n = new Notification();
+            n.setBookingId(finalSaved.getId());
+            n.setStudentId(currentUser.getUserId());
+            n.setMessage("Ticket created: " + finalSaved.getTitle());
+            n.setTimestamp(LocalDateTime.now());
+            n.setRead(false);
+            notificationRepository.save(n);
+        } catch (Exception ignored) {
+        }
+        return finalSaved;
     }
 
     @Override
@@ -95,8 +109,9 @@ public class TicketServiceImpl implements TicketService {
     @Override
     public Ticket updateTicket(String id, TicketUpdateRequest request, CurrentUser currentUser) {
         Ticket ticket = getById(id);
-        if (!Objects.equals(ticket.getReportedByUserId(), currentUser.getUserId())) {
-            throw new UnauthorizedActionException("Only owner can update this ticket");
+        // Allow owners or admins to update ticket details
+        if (!Objects.equals(ticket.getReportedByUserId(), currentUser.getUserId()) && !currentUser.hasRole("ADMIN")) {
+            throw new UnauthorizedActionException("Only owner or admin can update this ticket");
         }
         if (ticket.getStatus() != TicketStatus.OPEN) {
             throw new IllegalArgumentException("Only OPEN tickets can be edited");
@@ -110,7 +125,19 @@ public class TicketServiceImpl implements TicketService {
         ticket.setPreferredContactEmail(request.getPreferredContactEmail());
         ticket.setPreferredContactPhone(request.getPreferredContactPhone());
         ticket.setUpdatedAt(LocalDateTime.now());
-        return ticketRepository.save(ticket);
+        Ticket saved = ticketRepository.save(ticket);
+        try {
+            Notification n = new Notification();
+            n.setBookingId(saved.getId());
+            n.setStudentId(saved.getReportedByUserId());
+            String msg = "Ticket updated: " + (saved.getTitle() != null ? saved.getTitle() : saved.getId());
+            n.setMessage(msg);
+            n.setTimestamp(LocalDateTime.now());
+            n.setRead(false);
+            notificationRepository.save(n);
+        } catch (Exception ignored) {
+        }
+        return saved;
     }
 
     @Override
@@ -132,7 +159,42 @@ public class TicketServiceImpl implements TicketService {
             ticket.setRejectionReason(request.getRejectionReason());
         }
         ticket.setUpdatedAt(LocalDateTime.now());
-        return ticketRepository.save(ticket);
+        Ticket saved = ticketRepository.save(ticket);
+        try {
+            if (request.getTechnicianId() != null) {
+                Notification n = new Notification();
+                n.setBookingId(saved.getId());
+                n.setStudentId(request.getTechnicianId());
+                n.setMessage("You have been assigned ticket " + saved.getId());
+                n.setTimestamp(LocalDateTime.now());
+                n.setRead(false);
+                notificationRepository.save(n);
+            }
+            // Notify the ticket reporter about status changes (approve/reject/resolve etc.)
+            try {
+                String reporterId = saved.getReportedByUserId();
+                if (reporterId != null && !reporterId.isBlank()) {
+                    Notification reporterNote = new Notification();
+                    reporterNote.setBookingId(saved.getId());
+                    reporterNote.setStudentId(reporterId);
+                    StringBuilder msg = new StringBuilder();
+                    msg.append("Ticket status updated to ").append(saved.getStatus());
+                    if (saved.getRejectionReason() != null && !saved.getRejectionReason().isBlank()) {
+                        msg.append(": ").append(saved.getRejectionReason());
+                    }
+                    if (saved.getResolutionNotes() != null && !saved.getResolutionNotes().isBlank()) {
+                        msg.append(": ").append(saved.getResolutionNotes());
+                    }
+                    reporterNote.setMessage(msg.toString());
+                    reporterNote.setTimestamp(LocalDateTime.now());
+                    reporterNote.setRead(false);
+                    notificationRepository.save(reporterNote);
+                }
+            } catch (Exception ignored) {
+            }
+        } catch (Exception ignored) {
+        }
+        return saved;
     }
 
     @Override
@@ -185,7 +247,8 @@ public class TicketServiceImpl implements TicketService {
         boolean tech = currentUser.hasRole("TECHNICIAN");
         boolean assignedUser = Objects.equals(ticket.getAssignedTechnicianId(), currentUser.getUserId());
         if (current == TicketStatus.OPEN && next == TicketStatus.IN_PROGRESS && (admin || tech || assignedUser)) return;
-        if (current == TicketStatus.IN_PROGRESS && next == TicketStatus.RESOLVED && (tech || assignedUser)) {
+        // Allow admins to resolve tickets as well
+        if (current == TicketStatus.IN_PROGRESS && next == TicketStatus.RESOLVED && (admin || tech || assignedUser)) {
             if (request.getResolutionNotes() == null || request.getResolutionNotes().isBlank()) {
                 throw new IllegalArgumentException("resolutionNotes is required when resolving a ticket");
             }

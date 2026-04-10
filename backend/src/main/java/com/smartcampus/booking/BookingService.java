@@ -76,21 +76,34 @@ public class BookingService {
 
     booking.setStatus(status);
     bookingRepository.save(booking);
-
-    // FIX: Use .equalsIgnoreCase() to ensure the check passes 
-    // This is much safer than == or .equals()
-    if ("REJECTED".equalsIgnoreCase(status)) {
-        System.out.println("DEBUG: Entering Notification Save logic..."); // Add this print!
-        
-        Notification notification = new Notification();
-        notification.setBookingId(id);
-        notification.setStudentId(booking.getStudentId());
-        notification.setMessage(reason);
-        notification.setTimestamp(LocalDateTime.now());
-        notification.setRead(false);
-
-        notificationRepository.save(notification);
-        System.out.println("DEBUG: Notification saved to MongoDB!"); // Add this print!
+    // Create notifications for important status changes
+    try {
+        if ("REJECTED".equalsIgnoreCase(status)) {
+            Notification notification = new Notification();
+            notification.setBookingId(id);
+            notification.setStudentId(booking.getStudentId());
+            notification.setMessage(reason != null && !reason.isBlank() ? reason : "Your booking request was rejected.");
+            notification.setTimestamp(LocalDateTime.now());
+            notification.setRead(false);
+            notificationRepository.save(notification);
+        } else if ("APPROVED".equalsIgnoreCase(status)) {
+            Notification notification = new Notification();
+            notification.setBookingId(id);
+            notification.setStudentId(booking.getStudentId());
+            notification.setMessage("Your booking has been approved for " + booking.getResourceName());
+            notification.setTimestamp(LocalDateTime.now());
+            notification.setRead(false);
+            notificationRepository.save(notification);
+        } else if ("CANCELLED".equalsIgnoreCase(status)) {
+            Notification notification = new Notification();
+            notification.setBookingId(id);
+            notification.setStudentId(booking.getStudentId());
+            notification.setMessage("Your booking has been cancelled.");
+            notification.setTimestamp(LocalDateTime.now());
+            notification.setRead(false);
+            notificationRepository.save(notification);
+        }
+    } catch (Exception ignored) {
     }
 }
 

@@ -30,8 +30,11 @@ function AdminLogin() {
 
     try {
       const response = await api.post('/admin/login', formData)
-      const user = response.data
-      saveUser(user)
+      const data = response.data
+      const token = data?.token
+      const user = data?.user ?? data
+      if (token) localStorage.setItem('token', token)
+      saveUser(token ? { ...user, token } : user)
       navigate(getLandingRoute(user), { replace: true })
     } catch (requestError) {
       const message =

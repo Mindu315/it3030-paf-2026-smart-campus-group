@@ -10,4 +10,5 @@ public class TicketStatusUpdateRequest {
     private TicketStatus status;
     private String resolutionNotes;
     private String rejectionReason;
+    private String technicianId;
 }

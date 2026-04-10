@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { CheckCircle, XCircle, Clock, User, Building2, Inbox } from 'lucide-react';
 import BookingService from '../../services/BookingService';
+import { useToast } from '../../components/ui/ToastContext';
 
 const AdminBookingList = () => {
     const [bookings, setBookings] = useState([]); 
     const [activeTab, setActiveTab] = useState('PENDING');
     const [loading, setLoading] = useState(true);
+    const toast = useToast();
 
     // 1. LOAD ALL DATA
     const loadAllBookings = async () => {
@@ -28,11 +30,11 @@ const AdminBookingList = () => {
     if (adminReason) {
         try {
             await BookingService.updateStatus(id, "REJECTED", adminReason);
-            alert("Booking rejected successfully!");
+            toast.push('Booking rejected', { type: 'success' })
             loadAllBookings();
         } catch (error) {
             console.error("Update failed:", error);
-            alert("Could not update booking. Check if backend is running.");
+            toast.push('Could not update booking. Check backend.', { type: 'error' })
         }
     }
 };
@@ -44,14 +46,21 @@ const AdminBookingList = () => {
         return b.status === activeTab;
     });
 
-    const handleAction = async (id, status) => {
-        try {
-            await BookingService.updateStatus(id, status);
-            alert(`Booking has been ${status.toLowerCase()} successfully!`);
+    const handleAction = async (booking, status) => {
+            try {
+            // Confirm with date/time when approving
+            if (status === 'APPROVED') {
+                const start = booking.startTime ? new Date(booking.startTime).toLocaleString() : 'N/A'
+                const end = booking.endTime ? new Date(booking.endTime).toLocaleString() : 'N/A'
+                const confirmed = window.confirm(`Approve booking for ${booking.resourceName} on ${start} → ${end}?`)
+                if (!confirmed) return
+            }
+            await BookingService.updateStatus(booking.id, status);
+            toast.push(`Booking ${status.toLowerCase()}`, { type: 'success' })
             loadAllBookings(); // Refresh the data after the change
         } catch (err) {
             console.error("Error updating booking:", err);
-            alert("Failed to update status.");
+            toast.push('Failed to update status', { type: 'error' })
         }
     };
 
@@ -97,9 +106,9 @@ const AdminBookingList = () => {
                                 </div>
                                 <div>
                                     <h4 className="font-bold text-slate-900">{b.resourceName}</h4>
-                                    <div className="flex items-center gap-3 text-xs text-slate-500 mt-1">
-                                        <span className="flex items-center gap-1"><User size={14}/> {b.studentName}</span>
-                                        <span className="flex items-center gap-1"><Clock size={14}/> {new Date(b.startTime).toLocaleDateString()}</span>
+                                    <div className="flex flex-col text-xs text-slate-500 mt-1">
+                                        <span className="flex items-center gap-1"><User size={14}/> {b.studentName || b.studentId || 'Unknown user'}</span>
+                                        <span className="flex items-center gap-1"><Clock size={14}/> {b.startTime ? new Date(b.startTime).toLocaleString() : 'N/A'} → {b.endTime ? new Date(b.endTime).toLocaleString() : 'N/A'}</span>
                                     </div>
                                 </div>
                             </div>
@@ -108,15 +117,15 @@ const AdminBookingList = () => {
                             <div className="flex gap-2">
                                 {b.status === 'PENDING' ? (
                                     <>
-                                        <button 
-                                            onClick={() => handleAction(b.id, 'APPROVED')}
-                                            className="px-4 py-2 bg-emerald-50 text-emerald-700 rounded-xl text-sm font-bold hover:bg-emerald-100 transition flex items-center gap-2"
+                                        <button
+                                            onClick={() => handleAction(b, 'APPROVED')}
+                                            className="px-4 py-2 btn-approve rounded-xl text-sm font-bold transition flex items-center gap-2"
                                         >
                                             <CheckCircle size={16} /> Approve
                                         </button>
-                                        <button 
-                                            onClick={() => handleReject(b.id)} // <--- Make sure this name matches!
-                                            className="px-3 py-1 bg-rose-100 text-rose-600 rounded-lg hover:bg-rose-200"
+                                        <button
+                                            onClick={() => handleReject(b.id)}
+                                            className="px-3 py-1 btn-delete rounded-lg"
                                         >
                                             Reject
                                         </button>

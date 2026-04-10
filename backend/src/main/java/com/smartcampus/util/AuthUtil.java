@@ -5,6 +5,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 import jakarta.servlet.http.HttpServletRequest;
 
+import com.smartcampus.security.jwt.JwtPrincipal;
+
 @Component
 public class AuthUtil {
     private final HttpServletRequest request;
@@ -27,6 +29,11 @@ public class AuthUtil {
 
         if (authentication == null || !authentication.isAuthenticated()) {
             return new CurrentUser("guest-user", "guest@smartcampus.local", "USER");
+        }
+
+        if (authentication.getPrincipal() instanceof JwtPrincipal principal) {
+            String role = principal.roles() == null || principal.roles().isEmpty() ? "USER" : principal.roles().get(0);
+            return new CurrentUser(principal.id(), principal.email(), role);
         }
         String userId = authentication.getName();
         String email = authentication.getName();

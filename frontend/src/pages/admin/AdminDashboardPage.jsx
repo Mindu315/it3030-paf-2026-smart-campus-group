@@ -12,28 +12,67 @@ import {
 } from "lucide-react"
 
 import { getCurrentUser } from "../../utils/auth"
+import { useEffect, useState } from 'react'
+import UserService from '../../services/userService'
+import BookingService from '../../services/BookingService'
+import NotificationService from '../../services/notificationService'
+import * as TicketService from '../../services/ticketService'
 
 function Admin() {
   const user = getCurrentUser()
 
+  // data fetching
+  const [usersCount, setUsersCount] = useState(null)
+  const [ticketsCount, setTicketsCount] = useState(null)
+  const [bookingsCount, setBookingsCount] = useState(null)
+  const [activities, setActivities] = useState([])
+
+  useEffect(() => {
+    // users
+    UserService.getAllUsers()
+      .then((res) => setUsersCount(Array.isArray(res.data) ? res.data.length : 0))
+      .catch(() => setUsersCount(0))
+
+    // tickets (paginated response)
+    TicketService.getAllTickets({ page: 0, size: 1 })
+      .then((res) => setTicketsCount(res.data?.totalElements ?? (Array.isArray(res.data) ? res.data.length : 0)))
+      .catch(() => setTicketsCount(0))
+
+    // bookings
+    BookingService.getAllBookings()
+      .then((res) => setBookingsCount(Array.isArray(res.data) ? res.data.length : 0))
+      .catch(() => setBookingsCount(0))
+
+    // recent notifications for Recent Activity
+    NotificationService.getRecent()
+      .then((res) => {
+        const items = Array.isArray(res.data) ? res.data : []
+        const mapped = items.map((n) => ({
+          title: n.message,
+          time: n.timestamp ? new Date(n.timestamp).toLocaleString() : '',
+        }))
+        setActivities(mapped)
+      })
+      .catch(() => setActivities([]))
+  }, [])
   const stats = [
     {
       title: "Registered Users",
-      value: "124",
+      value: usersCount ?? '-',
       icon: Users,
       color: "text-sky-600",
       bg: "bg-sky-50",
     },
     {
       title: "Open Incident Tickets",
-      value: "08",
+      value: ticketsCount ?? '-',
       icon: ClipboardList,
       color: "text-rose-600",
       bg: "bg-rose-50",
     },
     {
       title: "Active Facility Bookings",
-      value: "37",
+      value: bookingsCount ?? '-',
       icon: CalendarDays,
       color: "text-emerald-600",
       bg: "bg-emerald-50",
@@ -45,13 +84,6 @@ function Admin() {
       color: "text-violet-600",
       bg: "bg-violet-50",
     },
-  ]
-
-  const activities = [
-    { title: "New user registered", time: "10 mins ago" },
-    { title: "Booking approved by Admin", time: "1 hour ago" },
-    { title: "Ticket marked In Progress", time: "4 hours ago" },
-    { title: "New notification sent to users", time: "Yesterday" },
   ]
 
   return (
@@ -253,5 +285,4 @@ function Admin() {
     </section>
   )
 }
-
 export default Admin

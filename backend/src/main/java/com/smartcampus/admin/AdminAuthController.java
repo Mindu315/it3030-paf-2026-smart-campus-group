@@ -10,12 +10,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.smartcampus.security.jwt.JwtService;
+
 @RestController
 @RequestMapping("/api/admin")
 public class AdminAuthController {
 
     private static final String ADMIN_EMAIL = "admin@smart.com";
     private static final String ADMIN_PASSWORD = "Admin123@";
+
+    private final JwtService jwtService;
+
+    public AdminAuthController(JwtService jwtService) {
+        this.jwtService = jwtService;
+    }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AdminLoginRequest request) {
@@ -27,13 +35,17 @@ public class AdminAuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid admin credentials.");
         }
 
+        String id = UUID.randomUUID().toString();
+        List<String> roles = List.of("ADMIN");
+        String token = jwtService.generateToken(id, ADMIN_EMAIL, roles);
+
         AdminLoginResponse response = new AdminLoginResponse(
-                UUID.randomUUID().toString(),
+                id,
                 "Administrator",
                 ADMIN_EMAIL,
-                List.of("ADMIN"));
+                roles,
+                token);
 
         return ResponseEntity.ok(response);
     }
 }
-

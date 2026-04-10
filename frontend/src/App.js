@@ -1,4 +1,5 @@
 import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom'
+import { ToastProvider } from './components/ui/ToastContext'
 import DashboardHome from './pages/HomePage'
 import Login from './pages/auth/LoginPage'
 import Register from './pages/auth/RegisterPage'
@@ -17,6 +18,7 @@ import CreateTicketPage from './pages/tickets/CreateTicketPage'
 import EditTicketPage from './pages/tickets/EditTicketPage'
 import TicketDetailPage from './pages/tickets/TicketDetailPage'
 import TicketListPage from './pages/tickets/TicketListPage'
+import UserProfilePage from './pages/user/UserProfilePage'
 import { getLandingRoute, hasRole, isAuthenticated } from './utils/auth'
 
 function RootRedirect() {
@@ -67,6 +69,7 @@ function App() {
       <div className="pointer-events-none fixed inset-0 -z-10 opacity-60 bg-[radial-gradient(circle_at_15%_10%,rgba(33,75,167,0.20),transparent_40%),radial-gradient(circle_at_85%_15%,rgba(124,58,237,0.16),transparent_42%)]" aria-hidden="true"></div>
 
       <BrowserRouter>
+        <ToastProvider>
         <Routes>
           <Route path="/" element={<RootRedirect />} />
           <Route path="/dashboard" element={<Navigate to="/home" replace />} />
@@ -109,6 +112,8 @@ function App() {
               <Route path="/home" element={<DashboardHome />} />
               <Route path="/notifications" element={<NotificationsPage />} />
 
+              <Route path="/profile" element={<UserProfilePage />} />
+
               <Route element={<ProtectedRoute allowedRoles={['USER']} />}>
                 <Route path="/resources" element={<ResourceCatalog />} />
                 <Route path="/bookings" element={<BookingsPage />} />
@@ -137,6 +142,7 @@ function App() {
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        </ToastProvider>
       </BrowserRouter>
     </div>
   )

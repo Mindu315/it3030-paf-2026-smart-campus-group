@@ -2,11 +2,15 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, Clock, Send, Info } from 'lucide-react';
 import BookingService from '../services/BookingService';
+import { getAllResources } from '../api/resourceService'
+import { useToast } from './ui/ToastContext'
+import { showError, showSuccess } from '../utils/swal'
 
 const BookingForm = ({ onBookingAdded }) => {
     const rawUser = localStorage.getItem("smartCampusUser");
     const savedUser = rawUser ? JSON.parse(rawUser) : null;
 
+    const [resources, setResources] = useState([])
     const [booking, setBooking] = useState({
         studentId: savedUser?.studentId || savedUser?.id || "",
         studentName: savedUser?.name || savedUser?.email || "",
@@ -15,19 +19,40 @@ const BookingForm = ({ onBookingAdded }) => {
         endTime: ''
     });
 
+    // load resources for the select box
+    const loadResources = async () => {
+        try {
+            const res = await getAllResources()
+            setResources(res.data || [])
+        } catch (err) {
+            setResources([])
+        }
+    }
+
+    React.useEffect(() => { loadResources() }, [])
+
+    const toast = useToast()
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!booking.studentId || !booking.studentName) {
-            alert("You must be logged in to submit a booking.");
+            await showError('You must be logged in to submit a booking.', 'Not signed in')
             return;
         }
         e.preventDefault();
         try {
             await BookingService.createBooking(booking);
-            alert("Booking Request Sent!");
+            toast.push(`Booking request sent for ${booking.resourceName || 'resource'}`, { type: 'success' })
             onBookingAdded(); // This triggers the List to refresh
         } catch (error) {
-            alert(error.response?.data || "Conflict: This time slot is already taken.");
+            const backendMsg = error?.response?.data || ''
+            const msg = String(backendMsg || 'Conflict: This time slot is already taken.')
+            if (/time slot|already booked|conflict|taken/i.test(msg)) {
+                const resource = booking.resourceName || 'selected resource'
+                await showError(`Time slot already booked for ${resource}. Try another slot or contact admin.`, 'Slot Unavailable')
+            } else {
+                toast.push(msg, { type: 'error' })
+            }
         }
     };
 
@@ -56,9 +81,9 @@ const BookingForm = ({ onBookingAdded }) => {
                         onChange={(e) => setBooking({...booking, resourceName: e.target.value})}
                     >
                         <option value="">-- Choose --</option>
-                        <option value="Common Lab">Lab A</option>
-                        <option value="Discussion Room B">Lab B</option>
-                        <option value="Main Auditorium">conference Room A</option>
+                        {resources.map((r) => (
+                            <option key={r.id} value={r.name}>{r.name} {r.location ? `— ${r.location}` : ''}</option>
+                        ))}
                     </select>
                 </div>
 

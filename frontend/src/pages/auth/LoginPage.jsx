@@ -29,9 +29,12 @@ function Login() {
     setIsSubmitting(true)
 
     try {
-      const response = await api.post("/api/users/login", formData)
-      const user = response.data
-      saveUser(user)
+      const response = await api.post("/users/login", formData)
+      const data = response.data
+      const token = data?.token
+      const user = data?.user ?? data
+      if (token) localStorage.setItem('token', token)
+      saveUser(token ? { ...user, token } : user)
       navigate(getLandingRoute(user), { replace: true })
     } catch (requestError) {
       const message =
@@ -164,8 +167,11 @@ function Login() {
               onSuccess={async (credentialResponse) => {
                 try {
                   const response = await api.post('/users/google-login', { token: credentialResponse.credential })
-                  const user = response.data
-                  saveUser(user)
+                  const data = response.data
+                  const token = data?.token
+                  const user = data?.user ?? data
+                  if (token) localStorage.setItem('token', token)
+                  saveUser(token ? { ...user, token } : user)
                   navigate(getLandingRoute(user), { replace: true })
                 } catch (requestError) {
                   const message = requestError.response?.data || "Google Login failed."

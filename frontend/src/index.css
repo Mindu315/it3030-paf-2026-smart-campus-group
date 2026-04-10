@@ -33,4 +33,110 @@
 	#root {
 		@apply min-h-screen;
 	}
+
+/*
+	Quick color unification: map commonly used utility color classes
+	to the Resource page palette (primary blue + purple accent).
+	This makes pages visually consistent without changing many files.
+*/
+
+.text-indigo-600,
+.text-indigo-700,
+.text-indigo-800,
+.text-rose-600,
+.text-emerald-600,
+.text-violet-600 {
+	color: var(--color-primary) !important;
+}
+
+.bg-indigo-50,
+.bg-indigo-100,
+.bg-rose-50,
+.bg-rose-100,
+.bg-emerald-50,
+.bg-emerald-100,
+.bg-violet-50,
+.bg-violet-100 {
+	background-color: rgba(33,75,167,0.06) !important; /* light primary */
+}
+
+.hover\:text-indigo-800:hover,
+.hover\:text-indigo-700:hover,
+.hover\:text-rose-600:hover,
+.hover\:text-emerald-700:hover,
+.hover\:text-violet-700:hover {
+	color: var(--color-primary) !important;
+}
+
+.hover\:bg-emerald-100:hover,
+.hover\:bg-rose-50:hover,
+.hover\:bg-violet-100:hover,
+.hover\:bg-indigo-100:hover {
+	background-color: rgba(33,75,167,0.08) !important;
+}
+
+/* Broader catch-all overrides to unify colors across all pages/components */
+[class*="text-indigo-"],
+[class*="text-emerald-"],
+[class*="text-rose-"],
+[class*="text-violet-"],
+[class*="text-orange-"],
+[class*="text-sky-"] {
+	color: var(--color-primary) !important;
+}
+
+[class*="bg-indigo-"],
+[class*="bg-emerald-"],
+[class*="bg-rose-"],
+[class*="bg-violet-"],
+[class*="bg-orange-"],
+[class*="bg-sky-"] {
+	background-color: rgba(33,75,167,0.06) !important;
+}
+
+[class*="border-indigo-"],
+[class*="border-emerald-"],
+[class*="border-rose-"],
+[class*="border-violet-"],
+[class*="border-orange-"],
+[class*="border-sky-"] {
+	border-color: rgba(33,75,167,0.12) !important;
+}
+
+/* Buttons/primary elements */
+.bg-emerald-600,
+.bg-indigo-600,
+.bg-sky-600,
+.bg-violet-600 {
+	background-color: var(--color-primary) !important;
+	color: white !important;
+}
+
+.text-emerald-600,
+.text-indigo-600,
+.text-sky-600 {
+	color: var(--color-primary) !important;
+}
+
+/* ensure hover states align */
+[class*="hover\:bg-"]:hover {
+	filter: none !important;
+}
+
+/* Explicit delete button style to keep red color across the app */
+.btn-delete {
+	background-color: #dc2626 !important; /* red-600 */
+	color: #ffffff !important;
+}
+.btn-delete:hover {
+	background-color: #b91c1c !important; /* red-700 */
+}
+/* Explicit approve button style to keep green color across the app */
+.btn-approve {
+	background-color: #16a34a !important; /* emerald-600 */
+	color: #ffffff !important;
+}
+.btn-approve:hover {
+	background-color: #15803d !important; /* emerald-700 */
+}
 }

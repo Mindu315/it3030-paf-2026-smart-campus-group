@@ -5,6 +5,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import com.smartcampus.security.jwt.JwtService;
+
 import java.util.List;
 
 @RestController
@@ -12,9 +14,11 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final JwtService jwtService;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, JwtService jwtService) {
         this.userService = userService;
+        this.jwtService = jwtService;
     }
 
     @PostMapping("/register")
@@ -31,7 +35,12 @@ public class UserController {
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         try {
             User authenticatedUser = userService.authenticateUser(loginRequest.email(), loginRequest.password());
-            return ResponseEntity.ok(authenticatedUser);
+            String token = jwtService.generateToken(
+                    authenticatedUser.getId(),
+                    authenticatedUser.getEmail(),
+                    authenticatedUser.getRoles()
+            );
+            return ResponseEntity.ok(new AuthResponse(authenticatedUser, token));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
@@ -41,7 +50,12 @@ public class UserController {
     public ResponseEntity<?> googleLogin(@RequestBody TokenRequest tokenRequest) {
         try {
             User authenticatedUser = userService.authenticateGoogleUser(tokenRequest.token());
-            return ResponseEntity.ok(authenticatedUser);
+            String token = jwtService.generateToken(
+                    authenticatedUser.getId(),
+                    authenticatedUser.getEmail(),
+                    authenticatedUser.getRoles()
+            );
+            return ResponseEntity.ok(new AuthResponse(authenticatedUser, token));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
@@ -87,4 +101,5 @@ public class UserController {
     // Simple record for the login payload
     public record LoginRequest(String email, String password) {}
     public record TokenRequest(String token) {}
+    public record AuthResponse(User user, String token) {}
 }

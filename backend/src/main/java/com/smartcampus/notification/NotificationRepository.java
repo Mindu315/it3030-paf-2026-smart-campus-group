@@ -9,4 +9,7 @@ public interface NotificationRepository extends MongoRepository<Notification, St
     
     // Matches 'studentId' and 'read' fields
     long countByStudentIdAndReadFalse(String studentId);
+    
+    // Recent notifications across all students (for admin dashboard)
+    List<Notification> findTop10ByOrderByTimestampDesc();
 }

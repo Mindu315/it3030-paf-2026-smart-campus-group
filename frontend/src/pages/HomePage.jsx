@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react' // 1. Added React hooks
-import axios from 'axios' // 2. Need axios for fetching
+import api from '../api/axiosConfig'
 import { motion } from "framer-motion"
 import { Link, useNavigate } from "react-router-dom"
 import {
@@ -11,23 +11,29 @@ import {
   ShieldCheck,
   ArrowUpRight,
 } from "lucide-react"
+import NotificationService from '../services/notificationService'
+import BookingService from '../services/BookingService'
+import { getAllTickets } from '../services/ticketService'
+import { getAllResources } from '../api/resourceService'
 
 function DashboardHome() {
   const navigate = useNavigate()
 
   const [unreadCount, setUnreadCount] = useState(0)
+  const [bookingsCount, setBookingsCount] = useState('-')
+  const [ticketsCount, setTicketsCount] = useState('-')
+  const [resourcesCount, setResourcesCount] = useState('-')
   // --- THE FIX: Using the correct key 'smartCampusUser' ---
   const rawData = localStorage.getItem("smartCampusUser");
   const savedUser = rawData ? JSON.parse(rawData) : null;
   const studentId = savedUser?.studentId || savedUser?.id;
   const userName = savedUser?.name || "Student";
   
-  // Dummy data (replace later with API data)
   const stats = [
-    { title: "Total Bookings", value: "12", icon: CalendarDays, color: "text-sky-600" },
-    { title: "Active Tickets", value: "4", icon: ClipboardList, color: "text-emerald-600" },
+    { title: "Total Bookings", value: bookingsCount, icon: CalendarDays, color: "text-sky-600" },
+    { title: "Active Tickets", value: ticketsCount, icon: ClipboardList, color: "text-emerald-600" },
     { title: "Unread Notifications", value: unreadCount.toString(), icon: Bell, color: "text-violet-600" },
-    { title: "Resources Available", value: "18", icon: Building2, color: "text-orange-600" },
+    { title: "Resources Available", value: resourcesCount, icon: Building2, color: "text-orange-600" },
   ]
 
   const activities = [
@@ -37,6 +43,42 @@ function DashboardHome() {
     { message: "New comment added on your ticket", time: "2 days ago" },
   ]
 
+    const [recentActivities, setRecentActivities] = useState([])
+
+    const fetchRecent = async () => {
+      if (!studentId) return
+      try {
+        const res = await NotificationService.getByStudent(studentId)
+        const list = Array.isArray(res.data) ? res.data : []
+        // map to activity shape and take top 4
+        const mapped = list.slice(0, 4).map((n) => ({ message: n.message, time: n.timestamp ? new Date(n.timestamp).toLocaleString() : '' }))
+        setRecentActivities(mapped)
+      } catch (err) {
+        console.error('Error fetching recent notifications:', err)
+      }
+    }
+
+    const fetchCounts = async () => {
+      try {
+        // Bookings
+        const bRes = await BookingService.getAllBookings()
+        const bCount = Array.isArray(bRes.data) ? bRes.data.length : (bRes.data?.totalElements ?? '-')
+        setBookingsCount(bCount ?? '-')
+
+        // Tickets (paged API returns totalElements)
+        const tRes = await getAllTickets({ page: 0, size: 1 })
+        const tCount = Array.isArray(tRes.data) ? tRes.data.length : (tRes.data?.totalElements ?? (tRes.data?.length ?? '-'))
+        setTicketsCount(tCount ?? '-')
+
+        // Resources
+        const rRes = await getAllResources()
+        const rCount = Array.isArray(rRes.data) ? rRes.data.length : (rRes.data?.totalElements ?? '-')
+        setResourcesCount(rCount ?? '-')
+      } catch (err) {
+        console.error('Error fetching dashboard counts:', err)
+      }
+    }
+
 
 // --- Replace your old 'const studentId = "STU_2026"' with this ---
 /*const savedUser = JSON.parse(localStorage.getItem("user"));
@@ -44,13 +86,11 @@ console.log("DEBUG: Stored User Object:", savedUser); // <--- Add this
 const studentId = savedUser?.studentId || savedUser?.id; */
 
 
-console.log("DEBUG: Stored User Object:", savedUser); // <--- Add this
-
 const fetchNotifications = async () => {
     if (!studentId) return;
 
     try {
-      const countRes = await axios.get(`http://localhost:8081/api/notifications/unread-count/${studentId}`);
+      const countRes = await api.get(`/notifications/unread-count/${studentId}`)
       setUnreadCount(countRes.data);
     } catch (err) {
       console.error("Error fetching notifications:", err);
@@ -65,6 +105,8 @@ useEffect(() => {
     }
 
     fetchNotifications();
+    fetchRecent();
+    fetchCounts();
   }, [studentId, navigate, savedUser]);
 
 
@@ -159,7 +201,7 @@ useEffect(() => {
               </div>
 
               <div className="mt-5 space-y-4">
-                {activities.map((activity, index) => (
+                {(recentActivities.length ? recentActivities : activities).map((activity, index) => (
                   <div
                     key={index}
                     className="flex items-start justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3"

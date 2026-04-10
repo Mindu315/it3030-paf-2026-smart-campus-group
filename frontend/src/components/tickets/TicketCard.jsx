@@ -25,7 +25,7 @@ function TicketCard({ ticket, onDelete }) {
         <button
           type="button"
           onClick={() => onDelete?.(ticket.id)}
-          className="mt-3 rounded bg-rose-600 px-3 py-1 text-xs font-medium text-white"
+          className="mt-3 rounded px-3 py-1 text-xs font-medium btn-delete"
         >
           Delete
         </button>

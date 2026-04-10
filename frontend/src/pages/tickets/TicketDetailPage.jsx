@@ -33,15 +33,25 @@ function TicketDetailPage() {
 
   if (error) return <p className="p-4">{error}</p>
   if (!ticket) return <p className="p-4">Loading...</p>
-  const availableNextStatuses = ticket.status === 'OPEN'
-    ? ['IN_PROGRESS']
-    : ticket.status === 'IN_PROGRESS'
-      ? ['RESOLVED']
-      : ticket.status === 'RESOLVED'
-        ? ['CLOSED']
-        : []
   const currentUser = getCurrentUser()
-  const canUpdateStatus = hasRole('ADMIN') || hasRole('TECHNICIAN') || currentUser?.id === ticket.assignedTechnicianId
+  const isAdmin = hasRole('ADMIN')
+  const isTech = hasRole('TECHNICIAN')
+  const isAssigned = currentUser?.id === ticket.assignedTechnicianId
+
+  // Mirror backend transition rules to avoid invalid requests
+  let availableNextStatuses = []
+  if (ticket.status === 'OPEN') {
+    if (isAdmin || isTech || isAssigned) availableNextStatuses = ['IN_PROGRESS']
+    if (isAdmin) availableNextStatuses.push('REJECTED')
+  } else if (ticket.status === 'IN_PROGRESS') {
+    // Admins should be able to resolve as well as reject; technicians/assigned can resolve
+    if (isAdmin || isTech || isAssigned) availableNextStatuses = ['RESOLVED']
+    if (isAdmin) availableNextStatuses = [...availableNextStatuses, 'REJECTED']
+  } else if (ticket.status === 'RESOLVED') {
+    if (isAdmin || isAssigned) availableNextStatuses = ['CLOSED']
+  }
+
+  const canUpdateStatus = isAdmin || isTech || isAssigned
 
   const submitStatus = async () => {
     setStatusError('')

@@ -1,39 +1,36 @@
-import axios from 'axios';
-
-// This URL must match your Spring Boot Server port (usually 8080 or 8081)
-const API_URL = "http://localhost:8081/api/bookings"; 
+import api from "../api/axiosConfig"
 
 const BookingService = {
     // 1. Send a new booking to the DB
     createBooking: (data) => {
-        return axios.post(`${API_URL}/add`, data);
+        return api.post(`/bookings/add`, data);
     },
 
     // 2. Get all pending bookings for the table
     getPendingBookings: () => {
-        return axios.get(`${API_URL}/pending`);
+        return api.get(`/bookings/pending`);
     },
 
     getBookingsByStudentId: (studentId) => {
-        return axios.get(`${API_URL}/student/${studentId}`);
+        return api.get(`/bookings/student/${studentId}`);
     },
 
     getPendingBookingsByStudent: (studentId) => {
-        return axios.get(`${API_URL}/student/${studentId}/pending`);
+        return api.get(`/bookings/student/${studentId}/pending`);
     },
 
     // 3. Delete a booking (The Cancel button logic)
     deleteBooking: (id) => {
-        return axios.delete(`${API_URL}/${id}`);
+        return api.delete(`/bookings/${id}`);
     },
 
     // 4. Update booking status with optional reason
     updateStatus: (id, status, reason = "") => {
-        return axios.put(`${API_URL}/${id}/status`, { status, reason });
+        return api.put(`/bookings/${id}/status`, { status, reason });
     },
 
     getAllBookings: () => {
-        return axios.get(`${API_URL}/all`);
+        return api.get(`/bookings/all`);
     },
 };
 

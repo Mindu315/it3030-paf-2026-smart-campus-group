@@ -19,6 +19,11 @@ public class NotificationController {
         return notificationRepository.findByStudentIdOrderByTimestampDesc(studentId);
     }
 
+    @GetMapping("/recent")
+    public List<Notification> getRecentNotifications() {
+        return notificationRepository.findTop10ByOrderByTimestampDesc();
+    }
+
     @GetMapping("/unread-count/{studentId}")
     public long getUnreadCount(@PathVariable String studentId) {
         // Matches the updated repository method name

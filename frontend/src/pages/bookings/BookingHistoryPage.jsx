@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Clock, Loader2, ArrowLeft, Trash2 } from 'lucide-react';
 import BookingService from '../../services/BookingService';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '../../components/ui/ToastContext'
 
 const BookingHistory = () => {
     const [bookings, setBookings] = useState([]);
@@ -33,6 +34,8 @@ const BookingHistory = () => {
         fetchMyBookings();
     }, [fetchMyBookings]);
 
+    const toast = useToast();
+
     // 3. Updated Handle Cancel
     const handleCancel = async (booking) => {
         const confirmMsg = booking.status === 'PENDING' 
@@ -44,17 +47,17 @@ const BookingHistory = () => {
                 // IMPORTANT: Ensure BookingService also sends the token if it's protected!
                 if (booking.status === 'PENDING') {
                     await BookingService.deleteBooking(booking.id);
-                    alert("Request deleted successfully.");
+                    toast.push('Request deleted successfully.', { type: 'success' })
                 } else {
                     await BookingService.updateStatus(booking.id, 'CANCELLED');
-                    alert("Booking cancelled.");
+                    toast.push('Booking cancelled.', { type: 'success' })
                 }
                 
                 // Refresh the list using our consolidated function
                 fetchMyBookings(); 
             } catch (error) {
                 console.error("Error during cancellation:", error);
-                alert("Action failed. Check console for details.");
+                toast.push('Action failed. Check console for details.', { type: 'error' })
             }
         }
     };

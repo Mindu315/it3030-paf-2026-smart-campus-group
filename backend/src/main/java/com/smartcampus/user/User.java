@@ -2,6 +2,7 @@ package com.smartcampus.user;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -11,6 +12,7 @@ public class User {
     private String id;
     private String name;
     private String email;
+    @JsonIgnore
     private String password;
     private List<String> roles = List.of("USER");
 

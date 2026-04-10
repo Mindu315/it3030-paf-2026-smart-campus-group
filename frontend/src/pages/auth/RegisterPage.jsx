@@ -27,13 +27,13 @@ function Register() {
     event.preventDefault()
     setError("")
     setSuccess("")
-    setIsSubmitting(true)
+	    setIsSubmitting(true)
 
-    try {
-      await api.post("/api/users/register", formData)
+	    try {
+	      await api.post("/users/register", formData)
 
-      setSuccess("Account created successfully. Redirecting to login...")
-      setFormData(initialForm)
+	      setSuccess("Account created successfully. Redirecting to login...")
+	      setFormData(initialForm)
 
       setTimeout(() => {
         navigate("/login")
