@@ -31,6 +31,15 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 public class TicketServiceImpl implements TicketService {
+    /** Role strings that may appear in MongoDB; JWT layer also accepts these with or without {@code ROLE_} prefix. */
+    private static final List<String> TECHNICIAN_ROLE_VALUES = List.of(
+            "TECHNICIAN",
+            "ROLE_TECHNICIAN",
+            "technician",
+            "role_technician",
+            "Technician",
+            "Role_Technician");
+
     private final TicketRepository ticketRepository;
     private final FileStorageService fileStorageService;
     private final UserRepository userRepository;
@@ -38,9 +47,7 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public Ticket createTicket(TicketCreateRequest request, MultipartFile[] attachments, CurrentUser currentUser) {
-        User technician = userRepository.findFirstByRolesContaining("TECHNICIAN")
-                .or(() -> userRepository.findFirstByRolesContaining("ROLE_TECHNICIAN"))
-                .orElse(null);
+        User technician = userRepository.findFirstByRolesIn(TECHNICIAN_ROLE_VALUES).orElse(null);
 
         Ticket ticket = Ticket.builder()
                 .title(request.getTitle())
@@ -90,7 +97,8 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public Page<Ticket> getMyTickets(CurrentUser currentUser, int page, int size) {
-        return ticketRepository.findByReportedByUserId(currentUser.getUserId(), PageRequest.of(page, size));
+        return ticketRepository.findByReportedByUserIdOrAssignedTechnicianId(
+                currentUser.getUserId(), PageRequest.of(page, size));
     }
 
     @Override

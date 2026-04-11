@@ -19,8 +19,9 @@ api.interceptors.request.use((config) => {
   if (parsed?.id) config.headers['X-User-Id'] = parsed.id
   if (parsed?.email) config.headers['X-User-Email'] = parsed.email
   if (parsed?.roles) {
-    const role = Array.isArray(parsed.roles) ? parsed.roles[0] : parsed.roles
-    if (role) config.headers['X-User-Role'] = role
+    const roles = Array.isArray(parsed.roles) ? parsed.roles : [parsed.roles]
+    const joined = roles.map(String).filter(Boolean).join(',')
+    if (joined) config.headers['X-User-Role'] = joined
   }
 
   return config

@@ -8,6 +8,7 @@ function TicketListPage() {
   const [tickets, setTickets] = useState([])
   const [loading, setLoading] = useState(true)
   const isAdmin = hasRole('ADMIN')
+  const isTechnician = hasRole('TECHNICIAN')
 
   useEffect(() => {
     loadTickets()
@@ -34,7 +35,9 @@ function TicketListPage() {
   return (
     <section className="mx-auto max-w-4xl p-4">
       <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{isAdmin ? 'All Tickets' : 'My Tickets'}</h1>
+        <h1 className="text-2xl font-bold">
+          {isAdmin ? 'All Tickets' : isTechnician ? 'My tickets & assignments' : 'My Tickets'}
+        </h1>
         <div className="flex items-center gap-2">
           <Link to={isAdmin ? '/admin' : '/home'} className="rounded border border-slate-300 px-3 py-2 text-slate-700">Back</Link>
           <Link to="/tickets/new" className="rounded bg-slate-900 px-3 py-2 text-white">New Ticket</Link>
