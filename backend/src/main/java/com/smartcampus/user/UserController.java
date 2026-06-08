@@ -72,7 +72,6 @@ public class UserController {
         }
     }
 
-    // 🛑 Temporarily commented out so you can test frontend!
     // @PreAuthorize("hasRole('ADMIN')") 
     @GetMapping 
     public ResponseEntity<?> getAllUsers() {
@@ -84,8 +83,7 @@ public class UserController {
         }
     }
 
-    // 🆕 NEW DELETE METHOD TO GET THOSE 10/10 MARKS!
-    // 🛑 Temporarily commented out Admin check so you can test it in Postman right now
+    
     // @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable String id) {

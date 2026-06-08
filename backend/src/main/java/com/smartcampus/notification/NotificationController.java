@@ -37,4 +37,14 @@ public void markAsRead(@PathVariable String id) {
     note.setRead(true); // Changes 'read' from false to true in MongoDB
     notificationRepository.save(note);
 }
+
+// 🧪 TEMPORARY POST METHOD JUST FOR POSTMAN TESTING
+    @PostMapping("/test-create")
+    public Notification createTestNotification(@RequestBody Notification notification) {
+        // Automatically set the time to exactly right now, and read to false!
+        notification.setTimestamp(java.time.LocalDateTime.now());
+        notification.setRead(false);
+        return notificationRepository.save(notification);
+    }
 }
+
